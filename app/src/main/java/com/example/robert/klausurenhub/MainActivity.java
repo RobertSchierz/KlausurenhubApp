@@ -19,13 +19,23 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
 
+import com.itextpdf.text.BadElementException;
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
+import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.res.BooleanRes;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -44,6 +54,7 @@ public class MainActivity extends AppCompatActivity {
     public Menu optionMenu;
 
     public String mCurrentPhotoPath;
+
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -66,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
 
     @AfterViews
     public void afterViews() {
+
 
         // Define a layout for RecyclerView
         recyclerView.setHasFixedSize(true);
@@ -149,11 +161,6 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        /*if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
-            Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            generateNewBitmapImage(imageBitmap);
-        }*/
         if (requestCode == REQUEST_TAKE_PHOTO) {
 
             Matrix matrix = new Matrix();
@@ -163,11 +170,6 @@ public class MainActivity extends AppCompatActivity {
             Bitmap imageBitmap = BitmapFactory.decodeFile(this.mCurrentPhotoPath);
             Bitmap rotatedBitmap = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.getWidth(), imageBitmap.getHeight(), matrix, true);
             generateNewBitmapImage(rotatedBitmap);
-            /*if (data != null) {
-                Bundle extras = data.getExtras();
-                Bitmap imageBitmap = (Bitmap) extras.get("data");
-                generateNewBitmapImage(imageBitmap);
-            }*/
 
 
         }
@@ -192,7 +194,6 @@ public class MainActivity extends AppCompatActivity {
 
         this.optionMenu = menu;
         getMenuInflater().inflate(R.menu.titlebarpreviewimages, menu);
-
         displayMenuItem(this.optionMenu, false, "convertImages");
         return true;
     }
@@ -214,12 +215,68 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_convert:
                 Log.v("AMK", "AMK");
-                ArrayList<String> test = this.getImagePaths();
+                try {
+                    this.convertToPDF();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
 
     }
+
+    public void convertToPDF() throws IOException, DocumentException {
+
+
+/*
+        Document document = new Document();
+        String outPath = Environment.getExternalStorageDirectory() + "/Klausurenhub.pdf";
+        PdfWriter.getInstance(document,new FileOutputStream(outPath));
+        document.open();
+
+        for(int i = 0; i < this.getImagePaths().size(); i++){
+            Image image = Image.getInstance (this.getImagePaths().get(i));
+            document.add(image);
+        }
+        document.close();*/
+
+       // File pdfFolder = new File(Environment.getExternalStoragePublicDirectory(
+        //        Environment.DIRECTORY_DOCUMENTS), "KlausurenhubPDFs");
+
+         File pdfFolder = new File(getExternalCacheDir(), "KlausurenhubPDFs");
+
+
+        if (!pdfFolder.exists()) {
+            Boolean test = pdfFolder.mkdirs();
+            Log.i("PDF: ", "Pdf Directory created: " + pdfFolder.getAbsolutePath());
+        }
+
+
+        Date date = new Date();
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(date);
+
+        File myFile = new File(pdfFolder + "/" + timeStamp + ".pdf");
+        OutputStream output = new FileOutputStream(myFile);
+
+        Rectangle pagesize = new Rectangle(216f, 720f);
+        Document document = new Document(pagesize, 36f, 72f, 108f, 180f);
+
+        PdfWriter.getInstance(document, output);
+        document.open();
+
+        for (int i = 0; i < this.getImagePaths().size(); i++) {
+            Image image = Image.getInstance(this.getImagePaths().get(i));
+            document.add(image);
+        }
+
+        document.close();
+
+
+    }
+
 
     public ArrayList<String> getImagePaths() {
         ArrayList<String> tempPathList = new ArrayList<String>();
