@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity {
             matrix.postRotate(90);
 
             Bitmap imageBitmap = BitmapFactory.decodeFile(this.mCurrentPhotoPath);
-            Bitmap rotatedBitmap = Bitmap.createBitmap(imageBitmap , 0, 0, imageBitmap .getWidth(), imageBitmap .getHeight(), matrix, true);
+            Bitmap rotatedBitmap = Bitmap.createBitmap(imageBitmap, 0, 0, imageBitmap.getWidth(), imageBitmap.getHeight(), matrix, true);
             generateNewBitmapImage(rotatedBitmap);
             /*if (data != null) {
                 Bundle extras = data.getExtras();
@@ -214,11 +214,20 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_convert:
                 Log.v("AMK", "AMK");
+                ArrayList<String> test = this.getImagePaths();
                 break;
         }
         return super.onOptionsItemSelected(item);
 
     }
 
+    public ArrayList<String> getImagePaths() {
+        ArrayList<String> tempPathList = new ArrayList<String>();
+        for (int i = 0; i < this.documentImageArray.size(); i++) {
+            tempPathList.add(this.documentImageArray.get(i).getPath());
+        }
+        return tempPathList;
 
+
+    }
 }
