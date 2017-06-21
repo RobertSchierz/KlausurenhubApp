@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Klausurenhub</string>
+    <string name="dialog_delete_image">Ausgewählte Bild löschen?</string>
+    <string name="delete_image">Löschen</string>
+    <string name="delete_image_cancel">Abbrechen</string>
+    <string name="title_activity_facebooklogin">Facebooklogin</string>
+    <string name="facebook_app_id">1710610359248953</string>
+</resources>

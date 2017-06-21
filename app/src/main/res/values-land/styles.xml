@@ -1,0 +1,10 @@
+<resources>
+
+
+    <style name="previewimage">
+        <item name="android:layout_width">150dp</item>
+        <item name="android:layout_height">350dp</item>
+    </style>
+
+
+</resources>
