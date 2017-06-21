@@ -101,7 +101,7 @@ class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
 
     @Override
     public int getItemCount() {
-        Toast.makeText(this.mContext, "Anzahl der Bilder: " + this.imageDataSet.size(), Toast.LENGTH_SHORT).show();
+        //Toast.makeText(this.mContext, "Anzahl der Bilder: " + this.imageDataSet.size(), Toast.LENGTH_SHORT).show();
         return this.imageDataSet.size();
     }
 

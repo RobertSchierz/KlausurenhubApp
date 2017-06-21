@@ -18,11 +18,13 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
+import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 
@@ -55,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
     public String mCurrentPhotoPath;
 
+    public File tempPDF;
 
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     static final int REQUEST_TAKE_PHOTO = 1;
@@ -125,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-            // startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
 
             File photoFile = null;
             try {
@@ -134,11 +136,8 @@ public class MainActivity extends AppCompatActivity {
                 // Error occurred while creating the File
 
             }
-            // Continue only if the File was successfully created
+
             if (photoFile != null) {
-             /*   Uri photoURI = FileProvider.getUriForFile(this,
-                        "com.example.robert.klausurenhub.fileprovider",
-                        photoFile);*/
 
                 String authorities = getApplicationContext().getPackageName() + ".fileprovider";
                 Uri photoURI = FileProvider.getUriForFile(this, authorities, photoFile);
@@ -214,9 +213,12 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_convert:
-                Log.v("AMK", "AMK");
                 try {
-                    this.convertToPDF();
+                    if(this.convertToPDF()){
+                        Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
+                        this.viewPdf();
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (DocumentException e) {
@@ -228,23 +230,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void convertToPDF() throws IOException, DocumentException {
+    public Boolean convertToPDF() throws IOException, DocumentException {
 
-
-/*
-        Document document = new Document();
-        String outPath = Environment.getExternalStorageDirectory() + "/Klausurenhub.pdf";
-        PdfWriter.getInstance(document,new FileOutputStream(outPath));
-        document.open();
-
-        for(int i = 0; i < this.getImagePaths().size(); i++){
-            Image image = Image.getInstance (this.getImagePaths().get(i));
-            document.add(image);
-        }
-        document.close();*/
-
-       // File pdfFolder = new File(Environment.getExternalStoragePublicDirectory(
-        //        Environment.DIRECTORY_DOCUMENTS), "KlausurenhubPDFs");
 
          File pdfFolder = new File(getExternalCacheDir(), "KlausurenhubPDFs");
 
@@ -259,10 +246,11 @@ public class MainActivity extends AppCompatActivity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(date);
 
         File myFile = new File(pdfFolder + "/" + timeStamp + ".pdf");
+        this.tempPDF = myFile;
         OutputStream output = new FileOutputStream(myFile);
 
-        Rectangle pagesize = new Rectangle(216f, 720f);
-        Document document = new Document(pagesize, 36f, 72f, 108f, 180f);
+        //Rectangle pagesize = new Rectangle(216f, 720f);
+        Document document = new Document(PageSize.A4, 36, 36, 36, 36);
 
         PdfWriter.getInstance(document, output);
         document.open();
@@ -274,7 +262,25 @@ public class MainActivity extends AppCompatActivity {
 
         document.close();
 
+        if(document != null){
+            return true;
+        }else{
+            return false;
+        }
 
+    }
+
+    private void viewPdf(){
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+
+        String authorities = getApplicationContext().getPackageName() + ".fileprovider";
+        Uri pdfURI = FileProvider.getUriForFile(this, authorities, this.tempPDF);
+
+        intent.setDataAndType(pdfURI, "application/pdf");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        startActivity(intent);
     }
 
 
