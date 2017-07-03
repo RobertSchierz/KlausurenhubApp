@@ -20,6 +20,12 @@ import android.view.MenuItem;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
@@ -33,6 +39,9 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.BooleanRes;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -64,6 +73,10 @@ public class MainActivity extends AppCompatActivity {
 
     public ArrayList<DocumentImage> documentImageArray = new ArrayList<>();
 
+    public String databaseURL = "http://klausurenhub.bplaced.net/androidapp/getavailableoptions.php";
+
+    RequestQueue requestQueue;
+
     //@ViewById
     //ImageView camerabutton;
 
@@ -92,6 +105,37 @@ public class MainActivity extends AppCompatActivity {
 
         // Set the adapter for RecyclerView
         recyclerView.setAdapter(mAdapter);
+
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, this.databaseURL, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                System.out.println(response.toString());
+                try {
+                    JSONArray schools = response.getJSONArray("schools");
+
+                    for(int i = 0; i < schools.length(); i++){
+                        JSONObject school = schools.getJSONObject(i);
+                        String schoolName = school.getString("schoolName");
+                        Log.v("AMK", schoolName);
+                    }
+
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener(){
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                error.printStackTrace();
+            }
+        });
+        requestQueue.add(jsonObjectRequest);
+
     }
 
 
@@ -216,13 +260,16 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     if(this.convertToPDF()){
                         Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
-                        this.viewPdf();
+                       // this.viewPdf();
+
+
                     }
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (DocumentException e) {
                     e.printStackTrace();
+
                 }
                 break;
         }
@@ -237,7 +284,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (!pdfFolder.exists()) {
-            Boolean test = pdfFolder.mkdirs();
+            pdfFolder.mkdirs();
             Log.i("PDF: ", "Pdf Directory created: " + pdfFolder.getAbsolutePath());
         }
 
@@ -249,15 +296,20 @@ public class MainActivity extends AppCompatActivity {
         this.tempPDF = myFile;
         OutputStream output = new FileOutputStream(myFile);
 
-        //Rectangle pagesize = new Rectangle(216f, 720f);
-        Document document = new Document(PageSize.A4, 36, 36, 36, 36);
+
+        Document document = new Document(PageSize.A4);
 
         PdfWriter.getInstance(document, output);
         document.open();
 
         for (int i = 0; i < this.getImagePaths().size(); i++) {
             Image image = Image.getInstance(this.getImagePaths().get(i));
+            image.setAbsolutePosition(0,0);
+            image.setAlignment(Image.ALIGN_CENTER);
+            image.scaleToFit(document.getPageSize().getWidth(), document.getPageSize().getHeight());
+            image.setRotationDegrees(-90);
             document.add(image);
+            document.newPage();
         }
 
         document.close();
