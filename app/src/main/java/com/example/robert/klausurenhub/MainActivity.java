@@ -20,11 +20,13 @@ import android.view.MenuItem;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
@@ -50,6 +52,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity {
@@ -107,35 +111,44 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setAdapter(mAdapter);
 
         requestQueue = Volley.newRequestQueue(getApplicationContext());
+        executeQuery();
+    }
 
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, this.databaseURL, new Response.Listener<JSONObject>() {
+    public void executeQuery(){
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, this.databaseURL, new Response.Listener<String>() {
             @Override
-            public void onResponse(JSONObject response) {
-                System.out.println(response.toString());
+            public void onResponse(String response) {
                 try {
-                    JSONArray schools = response.getJSONArray("schools");
 
-                    for(int i = 0; i < schools.length(); i++){
-                        JSONObject school = schools.getJSONObject(i);
-                        String schoolName = school.getString("schoolName");
-                        Log.v("AMK", schoolName);
-                    }
+                    JSONObject jsonObject= new JSONObject(response.toString());
+                    Log.v("AMK",jsonObject.getJSONArray("teachers").toString());
 
 
 
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
-        }, new Response.ErrorListener(){
 
+            }
+        }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                error.printStackTrace();
-            }
-        });
-        requestQueue.add(jsonObjectRequest);
 
+            }
+        }){
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String,String> parameters = new HashMap<String,String>();
+                String param = "";
+                parameters.put("parameter",param);
+
+                return parameters;
+            }
+
+        };
+
+        requestQueue.add(stringRequest);
     }
 
 
