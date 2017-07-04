@@ -30,6 +30,8 @@ import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -90,14 +92,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void setAvailableOptions(){
+
+
+    public void setAvailableOptions() {
         this.availableoptions = new AvailableAttributes(getApplicationContext());
 
-        this.availableoptions.getAvailableOptions(new AvailableAttributes.VolleyCallback(){
+        this.availableoptions.getAvailableOptions(new AvailableAttributes.VolleyCallback() {
 
             @Override
-            public void getSchools(JSONArray schools) {
+            public void getSchools(JSONArray schools) throws JSONException {
                 AvailableAttributes.schools = schools;
+                AvailableAttributes.availableschools = extractAvailableOptions(schools, "schoolName") ;
             }
 
             @Override
@@ -128,6 +133,16 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void getYears(JSONArray years) {
                 AvailableAttributes.years = years;
+            }
+
+            public ArrayList<String> extractAvailableOptions(JSONArray sourcearray, String columnName) throws JSONException {
+                ArrayList<String> tempArraylist = new ArrayList<String>();
+                for(int i = 0; i < sourcearray.length(); i++){
+                    JSONObject tempJSONObject = sourcearray.getJSONObject(i);
+                    tempArraylist.add(tempJSONObject.getString(columnName));
+                }
+                return tempArraylist;
+
             }
 
         });
@@ -256,9 +271,7 @@ public class MainActivity extends AppCompatActivity {
                     if (this.convertToPDF()) {
                         Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
 
-                        Log.v("AMK", AvailableAttributes.teachers.toString());
-
-
+                        Log.v("AMK", AvailableAttributes.availableschools.toString());
                     }
 
                 } catch (IOException e) {

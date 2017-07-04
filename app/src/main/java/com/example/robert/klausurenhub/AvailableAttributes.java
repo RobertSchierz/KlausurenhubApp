@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,6 +35,15 @@ public class AvailableAttributes {
     public static JSONArray subjects;
     public static JSONArray teachers;
     public static JSONArray years;
+
+    public static ArrayList<String> availableschools;
+    public static ArrayList<String> availablecourses;
+    public static ArrayList<String> availabledegrees;
+    public static ArrayList<String> availablesemesters;
+    public static ArrayList<String> availablesubjects;
+    public static ArrayList<String> availableteachers;
+    public static ArrayList<String> availableyears;
+
 
     public final String databaseURL = "http://klausurenhub.bplaced.net/androidapp/getavailableoptions.php";
 
@@ -92,7 +102,7 @@ public class AvailableAttributes {
     }
 
     public interface VolleyCallback {
-        void getSchools(JSONArray schools);
+        void getSchools(JSONArray schools) throws JSONException;
 
         void getCourses(JSONArray courses);
 
@@ -105,6 +115,8 @@ public class AvailableAttributes {
         void getTeachers(JSONArray teachers);
 
         void getYears(JSONArray years);
+
+
     }
 
 }
