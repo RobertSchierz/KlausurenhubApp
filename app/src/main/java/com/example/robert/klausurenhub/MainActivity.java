@@ -11,7 +11,6 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,30 +19,17 @@ import android.view.MenuItem;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
-import com.android.volley.AuthFailureError;
-import com.android.volley.Request;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
-import com.android.volley.toolbox.Volley;
-import com.itextpdf.text.BadElementException;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
-import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
-import org.androidannotations.annotations.res.BooleanRes;
 import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,8 +38,6 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity {
@@ -77,13 +61,7 @@ public class MainActivity extends AppCompatActivity {
 
     public ArrayList<DocumentImage> documentImageArray = new ArrayList<>();
 
-    public String databaseURL = "http://klausurenhub.bplaced.net/androidapp/getavailableoptions.php";
-
-    RequestQueue requestQueue;
-
-    //@ViewById
-    //ImageView camerabutton;
-
+    public AvailableAttributes availableoptions;
 
     @ViewById
     FloatingActionButton cameraButton;
@@ -91,9 +69,6 @@ public class MainActivity extends AppCompatActivity {
     @ViewById
     RecyclerView recyclerView;
 
-
-//    @ViewById
-//    ImageView previewImage;
 
     @AfterViews
     public void afterViews() {
@@ -110,45 +85,52 @@ public class MainActivity extends AppCompatActivity {
         // Set the adapter for RecyclerView
         recyclerView.setAdapter(mAdapter);
 
-        requestQueue = Volley.newRequestQueue(getApplicationContext());
-        executeQuery();
+        this.setAvailableOptions();
+
+
     }
 
-    public void executeQuery(){
+    public void setAvailableOptions(){
+        this.availableoptions = new AvailableAttributes(getApplicationContext());
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, this.databaseURL, new Response.Listener<String>() {
+        this.availableoptions.getAvailableOptions(new AvailableAttributes.VolleyCallback(){
+
             @Override
-            public void onResponse(String response) {
-                try {
-
-                    JSONObject jsonObject= new JSONObject(response.toString());
-                    Log.v("AMK",jsonObject.getJSONArray("teachers").toString());
-
-
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-
-            }
-        }){
-            @Override
-            protected Map<String, String> getParams() throws AuthFailureError {
-                Map<String,String> parameters = new HashMap<String,String>();
-                String param = "";
-                parameters.put("parameter",param);
-
-                return parameters;
+            public void getSchools(JSONArray schools) {
+                AvailableAttributes.schools = schools;
             }
 
-        };
+            @Override
+            public void getCourses(JSONArray courses) {
+                AvailableAttributes.courses = courses;
+            }
 
-        requestQueue.add(stringRequest);
+            @Override
+            public void getDegrees(JSONArray degrees) {
+                AvailableAttributes.degrees = degrees;
+            }
+
+            @Override
+            public void getSemesters(JSONArray semesters) {
+                AvailableAttributes.semesters = semesters;
+            }
+
+            @Override
+            public void getSubjects(JSONArray subjects) {
+                AvailableAttributes.subjects = subjects;
+            }
+
+            @Override
+            public void getTeachers(JSONArray teachers) {
+                AvailableAttributes.teachers = teachers;
+            }
+
+            @Override
+            public void getYears(JSONArray years) {
+                AvailableAttributes.years = years;
+            }
+
+        });
     }
 
 
@@ -271,9 +253,10 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_convert:
                 try {
-                    if(this.convertToPDF()){
+                    if (this.convertToPDF()) {
                         Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
-                       // this.viewPdf();
+
+                        Log.v("AMK", AvailableAttributes.teachers.toString());
 
 
                     }
@@ -293,7 +276,7 @@ public class MainActivity extends AppCompatActivity {
     public Boolean convertToPDF() throws IOException, DocumentException {
 
 
-         File pdfFolder = new File(getExternalCacheDir(), "KlausurenhubPDFs");
+        File pdfFolder = new File(getExternalCacheDir(), "KlausurenhubPDFs");
 
 
         if (!pdfFolder.exists()) {
@@ -317,7 +300,7 @@ public class MainActivity extends AppCompatActivity {
 
         for (int i = 0; i < this.getImagePaths().size(); i++) {
             Image image = Image.getInstance(this.getImagePaths().get(i));
-            image.setAbsolutePosition(0,0);
+            image.setAbsolutePosition(0, 0);
             image.setAlignment(Image.ALIGN_CENTER);
             image.scaleToFit(document.getPageSize().getWidth(), document.getPageSize().getHeight());
             image.setRotationDegrees(-90);
@@ -327,15 +310,15 @@ public class MainActivity extends AppCompatActivity {
 
         document.close();
 
-        if(document != null){
+        if (document != null) {
             return true;
-        }else{
+        } else {
             return false;
         }
 
     }
 
-    private void viewPdf(){
+    private void viewPdf() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
         String authorities = getApplicationContext().getPackageName() + ".fileprovider";
