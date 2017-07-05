@@ -27,5 +27,9 @@
         <item name="colorControlActivated">@color/primorange</item>
     </style>
 
+    <style name="Spinner">
+        <item name="colorControlNormal">@color/primorange</item>
+    </style>
+
 
 </resources>
