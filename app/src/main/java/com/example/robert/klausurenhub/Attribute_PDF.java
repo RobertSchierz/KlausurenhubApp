@@ -1,12 +1,19 @@
 package com.example.robert.klausurenhub;
 
 import android.support.v7.app.AppCompatActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
@@ -42,6 +49,21 @@ public class Attribute_PDF extends AppCompatActivity {
     @ViewById
     AutoCompleteTextView autoCompleteTextView_years;
 
+    @ViewById
+    EditText textinput_name;
+
+    public Menu optionMenu;
+
+
+    public boolean filled_name = false;
+    public boolean filled_school = false;
+    public boolean filled_teacher = false;
+    public boolean filled_course = false;
+    public boolean filled_subject = false;
+    public boolean filled_year = false;
+
+    public boolean allfilled = false;
+
 
     @AfterViews
     public void afterViews() {
@@ -56,53 +78,158 @@ public class Attribute_PDF extends AppCompatActivity {
         this.createArrayAdapterForSpinner(AvailableAttributes.availabledegrees, this.spinner_degrees);
         this.createArrayAdapterForSpinner(AvailableAttributes.availablesemesters, this.spinner_semesters);
 
-
-
+        setChangeListener(null, textinput_name, "name");
+        setChangeListener(this.autoCompleteTextView_schools, null, "school");
+        setChangeListener(this.autoCompleteTextView_teachers, null, "teacher");
+        setChangeListener(this.autoCompleteTextView_courses, null, "course");
+        setChangeListener(this.autoCompleteTextView_subjects, null, "subject");
+        setChangeListener(this.autoCompleteTextView_years, null, "year");
 
 
     }
 
-    /*public void spinnerAdapter(){
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_dropdown_item) {
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
 
-            @Override
-            public View getView(int position, View convertView, ViewGroup parent) {
+        this.optionMenu = menu;
+        getMenuInflater().inflate(R.menu.titlebarattribute, menu);
+        displayMenuItem(this.optionMenu, false, "uploadtoserver");
+        return true;
+    }
 
-                View v = super.getView(position, convertView, parent);
-                if (position == getCount()) {
-                    ((TextView)v.findViewById(android.R.id.text1)).setText("");
-                    ((TextView)v.findViewById(android.R.id.text1)).setHint(getItem(getCount())); //"Hint to be displayed"
+    public void displayMenuItem(Menu menu, boolean show, String itemtitle) {
+
+        for (int i = 0; i < menu.size(); i++) {
+            if (menu.getItem(i).getTitle().equals(itemtitle)) {
+                menu.getItem(i).setVisible(show);
+
+            }
+
+        }
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_upload:
+
+                Toast.makeText(getApplication().getApplicationContext(), "Upload zum Server", Toast.LENGTH_SHORT).show();
+
+
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+
+    }
+
+    public void setfilledBoolean(boolean filledBool, final String source) {
+
+        switch (source) {
+            case "name":
+                this.filled_name = filledBool;
+                break;
+            case "school":
+                this.filled_school = filledBool;
+                break;
+            case "teacher":
+                this.filled_teacher = filledBool;
+                break;
+            case "course":
+                this.filled_course = filledBool;
+                break;
+            case "subject":
+                this.filled_subject = filledBool;
+                break;
+            case "year":
+                this.filled_year = filledBool;
+                break;
+            default:
+                Log.e("Error", "Fehler beim befüllen der Boolean!");
+                break;
+        }
+
+    }
+
+
+
+    public void checkAllFilled() {
+        if (this.filled_name &&
+                this.filled_school &&
+                this.filled_teacher &&
+                this.filled_course &&
+                this.filled_subject &&
+                this.filled_year) {
+
+            this.allfilled = true;
+            displayMenuItem(this.optionMenu, true, "uploadtoserver");
+        } else {
+            this.allfilled = false;
+            displayMenuItem(this.optionMenu, false, "uploadtoserver");
+        }
+
+    }
+
+    public void setChangeListener(AutoCompleteTextView autoCompletementElement, EditText pdfname, final String source) {
+
+        if (autoCompletementElement != null) {
+            autoCompletementElement.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
                 }
 
-                return v;
-            }
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() != 0) {
+                        setfilledBoolean(true, source);
+                        checkAllFilled();
+                    } else if (s.length() == 0) {
+                        setfilledBoolean(false, source);
+                        checkAllFilled();
+                    }
+                }
 
-            @Override
-            public int getCount() {
-                return super.getCount()-1; // you dont display last item. It is used as hint.
-            }
+                @Override
+                public void afterTextChanged(Editable s) {
 
-        };
+                }
+            });
+        } else if (pdfname != null) {
+            pdfname.addTextChangedListener(new TextWatcher() {
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        adapter.add("Item 1");
-        adapter.add("Item 2");
-        adapter.add("Hint to be displayed");
+                }
 
-        spinner_degrees.setAdapter(adapter);
-        spinner_degrees.setSelection(adapter.getCount()); //display hint
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    if (s.length() != 0) {
+                        setfilledBoolean(true, source);
+                        checkAllFilled();
+                    } else if (s.length() == 0) {
+                        setfilledBoolean(false, source);
+                        checkAllFilled();
+                    }
+                }
+
+                @Override
+                public void afterTextChanged(Editable s) {
+
+                }
+            });
+        }
+
     }
 
-    */
 
-    public void createArrayAdapterForSpinner(ArrayList<String> arrayList, Spinner spinner){
+    public void createArrayAdapterForSpinner(ArrayList<String> arrayList, Spinner spinner) {
         ArrayAdapter<String> spinnerAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_spinner_dropdown_item, arrayList);
 
         spinner.setAdapter(spinnerAdapter);
     }
 
-    public void createArrayAdapter(ArrayList<String> arrayList, AutoCompleteTextView autoCompleteTextView){
+    public void createArrayAdapter(ArrayList<String> arrayList, AutoCompleteTextView autoCompleteTextView) {
         ArrayAdapter<String> autocompletetextAdapter = new ArrayAdapter<String>(this,
                 android.R.layout.simple_dropdown_item_1line, arrayList);
 

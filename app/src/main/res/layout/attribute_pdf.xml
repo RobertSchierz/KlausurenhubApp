@@ -3,6 +3,19 @@
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <EditText
+        android:id="@+id/textinput_name"
+        android:ems="18"
+        android:inputType="textPersonName"
+        android:layout_width="305dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:hint="Klausurenname"
+        android:imeOptions="actionNext"
+        android:theme="@style/Autocomplete"/>
+        android:text="Name" />
+
     <AutoCompleteTextView
         android:id="@+id/autoCompleteTextView_schools"
         android:layout_width="305dp"
