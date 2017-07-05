@@ -90,6 +90,8 @@ public class MainActivity extends AppCompatActivity {
         this.setAvailableOptions();
 
 
+
+
     }
 
 
@@ -106,33 +108,39 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void getCourses(JSONArray courses) {
+            public void getCourses(JSONArray courses) throws JSONException {
                 AvailableAttributes.courses = courses;
+                AvailableAttributes.availablecourses = extractAvailableOptions(courses, "courseName");
             }
 
             @Override
-            public void getDegrees(JSONArray degrees) {
+            public void getDegrees(JSONArray degrees) throws JSONException {
                 AvailableAttributes.degrees = degrees;
+                AvailableAttributes.availabledegrees = extractAvailableOptions(degrees, "degreeName");
             }
 
             @Override
-            public void getSemesters(JSONArray semesters) {
+            public void getSemesters(JSONArray semesters) throws JSONException {
                 AvailableAttributes.semesters = semesters;
+                AvailableAttributes.availablesemesters = extractAvailableOptions(semesters, "semesterName");
             }
 
             @Override
-            public void getSubjects(JSONArray subjects) {
+            public void getSubjects(JSONArray subjects) throws JSONException {
                 AvailableAttributes.subjects = subjects;
+                AvailableAttributes.availablesubjects = extractAvailableOptions(subjects, "subjectName");
             }
 
             @Override
-            public void getTeachers(JSONArray teachers) {
+            public void getTeachers(JSONArray teachers) throws JSONException {
                 AvailableAttributes.teachers = teachers;
+                AvailableAttributes.availableteachers = extractAvailableOptions(teachers, "teacherName");
             }
 
             @Override
-            public void getYears(JSONArray years) {
+            public void getYears(JSONArray years) throws JSONException {
                 AvailableAttributes.years = years;
+                AvailableAttributes.availableyears = extractAvailableOptions(years, "yearName");
             }
 
             public ArrayList<String> extractAvailableOptions(JSONArray sourcearray, String columnName) throws JSONException {
@@ -262,24 +270,24 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void startAttributeActivity(){
+        startActivity(new Intent(MainActivity.this, Attribute_PDF_.class));
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_convert:
-                try {
-                    if (this.convertToPDF()) {
-                        Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
 
-                        Log.v("AMK", AvailableAttributes.availableschools.toString());
-                    }
+                Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
 
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (DocumentException e) {
-                    e.printStackTrace();
 
-                }
+                this.startAttributeActivity();
+                // if (this.convertToPDF()) {
+
+
+                // }
+
                 break;
         }
         return super.onOptionsItemSelected(item);

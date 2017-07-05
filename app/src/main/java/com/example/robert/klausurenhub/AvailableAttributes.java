@@ -104,17 +104,17 @@ public class AvailableAttributes {
     public interface VolleyCallback {
         void getSchools(JSONArray schools) throws JSONException;
 
-        void getCourses(JSONArray courses);
+        void getCourses(JSONArray courses) throws JSONException;
 
-        void getDegrees(JSONArray degrees);
+        void getDegrees(JSONArray degrees) throws JSONException;
 
-        void getSemesters(JSONArray semesters);
+        void getSemesters(JSONArray semesters) throws JSONException;
 
-        void getSubjects(JSONArray subjects);
+        void getSubjects(JSONArray subjects) throws JSONException;
 
-        void getTeachers(JSONArray teachers);
+        void getTeachers(JSONArray teachers) throws JSONException;
 
-        void getYears(JSONArray years);
+        void getYears(JSONArray years) throws JSONException;
 
 
     }

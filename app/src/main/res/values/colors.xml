@@ -5,4 +5,6 @@
     <color name="colorAccent">#FF4081</color>
     <color name="floatingActionButton">#FF9900</color>
     <color name="facebooklogin_success">#5FBA7D</color>
+    <color name="primorange">#FF9900</color>
+    <color name="secorange">#875407</color>
 </resources>
