@@ -2,6 +2,7 @@ package com.example.robert.klausurenhub;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -90,6 +91,10 @@ public class MainActivity extends AppCompatActivity {
         this.setAvailableOptions();
 
 
+        SharedPreferences prefs = getSharedPreferences("Facebookdata", 0);
+        String facebookname = prefs.getString("facebookname", "default_value");
+        AvailableAttributes.username = facebookname;
+        Toast.makeText(getApplication().getApplicationContext(), "Eingeloggt als: " + AvailableAttributes.username, Toast.LENGTH_SHORT).show();
 
 
     }

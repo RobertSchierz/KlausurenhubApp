@@ -44,6 +44,8 @@ public class AvailableAttributes {
     public static ArrayList<String> availableteachers;
     public static ArrayList<String> availableyears;
 
+    public static String username;
+
 
     public final String databaseURL = "http://klausurenhub.bplaced.net/androidapp/getavailableoptions.php";
 
