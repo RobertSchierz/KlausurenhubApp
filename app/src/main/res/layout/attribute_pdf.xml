@@ -1,122 +1,180 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<ScrollView
 
-    <EditText
-        android:id="@+id/textinput_name"
-        android:ems="18"
-        android:inputType="textPersonName"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:hint="Klausurenname"
-        android:imeOptions="actionNext"
-        android:theme="@style/Autocomplete"/>
-        android:text="Name" />
-
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView_schools"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:hint="Uni/Fachhochschule"
-        android:inputType="text"
-        android:imeOptions="actionNext"
-        android:theme="@style/Autocomplete"/>
-        />
-
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView_teachers"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:hint="Lehrkraft"
-        android:inputType="text"
-        android:imeOptions="actionNext"
-        android:theme="@style/Autocomplete"/>
-    />
-
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView_courses"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:hint="Studiengang"
-        android:inputType="text"
-        android:imeOptions="actionNext"
-        android:theme="@style/Autocomplete"/>
-    />
-
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView_subjects"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:hint="Modul"
-        android:inputType="text"
-        android:imeOptions="actionNext"
-        android:theme="@style/Autocomplete"/>
-
-    <TextView
-        android:id="@+id/textview_degrees"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="40dp"
-        android:text="Grad:"
-        android:textAlignment="viewStart"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <Spinner
-        android:id="@+id/spinner_degrees"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textSize="18sp"
-        android:theme="@style/Spinner"
-        android:padding="0dp"
-        />
-
-    <TextView
-        android:id="@+id/textview_semesters"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:text="Semester:"
-        android:textAlignment="viewStart"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
-    <Spinner
-        android:id="@+id/spinner_semesters"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:textSize="18sp"
-        android:theme="@style/Spinner"
-        android:padding="0dp"
-        />
-
-    <AutoCompleteTextView
-        android:id="@+id/autoCompleteTextView_years"
-        android:layout_width="305dp"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:hint="Jahr"
-        android:inputType="number"
-        android:imeOptions="actionDone"
-        android:theme="@style/Autocomplete"/>
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
 
-</LinearLayout>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/personNameWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:theme="@style/Autocomplete">
+
+            <EditText
+                android:id="@+id/textinput_name"
+                android:layout_width="305dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:ems="18"
+                android:hint="Klausurenname"
+                android:imeOptions="actionNext"
+                android:inputType="textPersonName"
+                android:theme="@style/Autocomplete" />
+            android:text="Name" />
+
+        </android.support.design.widget.TextInputLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/schoolsWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:theme="@style/Autocomplete">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextView_schools"
+                android:layout_width="305dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Uni/Fachhochschule"
+                android:imeOptions="actionNext"
+                android:inputType="text"
+                android:theme="@style/Autocomplete" />
+            />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/teachersWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:theme="@style/Autocomplete">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextView_teachers"
+                android:layout_width="305dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Lehrkraft"
+                android:imeOptions="actionNext"
+                android:inputType="text"
+                android:theme="@style/Autocomplete" />
+            />
+
+        </android.support.design.widget.TextInputLayout>
+
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/coursesWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:theme="@style/Autocomplete">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextView_courses"
+                android:layout_width="305dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Studiengang"
+                android:imeOptions="actionNext"
+                android:inputType="text"
+                android:theme="@style/Autocomplete" />
+            />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/subjectsWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:theme="@style/Autocomplete">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextView_subjects"
+                android:layout_width="305dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Modul"
+                android:imeOptions="actionNext"
+                android:inputType="text"
+                android:theme="@style/Autocomplete" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/yearsWrapper"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:theme="@style/Autocomplete">
+
+            <AutoCompleteTextView
+                android:id="@+id/autoCompleteTextView_years"
+                android:layout_width="305dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:hint="Jahr"
+                android:imeOptions="actionDone"
+                android:inputType="number"
+                android:theme="@style/Autocomplete" />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <TextView
+            android:id="@+id/textview_degrees"
+            android:layout_width="305dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="15dp"
+            android:text="Grad:"
+            android:textAlignment="viewStart"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spinner_degrees"
+            android:layout_width="305dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:padding="0dp"
+            android:textSize="18sp"
+            android:theme="@style/Spinner" />
+
+        <TextView
+            android:id="@+id/textview_semesters"
+            android:layout_width="305dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="Semester:"
+            android:textAlignment="viewStart"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+
+        <Spinner
+            android:id="@+id/spinner_semesters"
+            android:layout_width="305dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:padding="0dp"
+            android:textSize="18sp"
+            android:theme="@style/Spinner" />
+
+
+    </LinearLayout>
+
+</ScrollView>

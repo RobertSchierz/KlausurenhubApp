@@ -117,7 +117,7 @@ public class Facebooklogin extends AppCompatActivity {
                            // Log.e("Result", me.toString());
                             SharedPreferences prefs = getSharedPreferences("Facebookdata", Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = prefs.edit();
-                            editor.putString("facebookname", me.optString("name"));
+                            editor.putString("facebookname", me.optString("name "));
                             editor.commit();
                         }
                     }
