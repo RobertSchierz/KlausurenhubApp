@@ -86,8 +86,14 @@ public class ResponsePDF {
         Log.e("username", this.uploaderName);
         Log.e("path", this.path);
 
-        if(this.schoolexist){
-
+        if(!this.schoolexist){
+            updateDatabaseTable(this.schoolVal, "schools", "schoolName", "schoolID", new VolleyCallback() {
+                @Override
+                public void getNewID(JSONObject ids) throws JSONException {
+                    Log.e("neue ID", ids.getString("schoolID"));
+                    AvailableAttributes.availableschools.add(schoolVal);
+                }
+            });
         }
 
     }
@@ -102,9 +108,8 @@ public class ResponsePDF {
                     String newID;
 
                     JSONObject jsonObject = new JSONObject(response.toString());
-                    callback.getNewID(jsonObject.getJSONArray(idname));
 
-
+                    callback.getNewID(jsonObject);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -215,7 +220,7 @@ public class ResponsePDF {
 
     public interface VolleyCallback {
 
-        void getNewID(JSONArray ids) throws JSONException;
+        void getNewID(JSONObject ids) throws JSONException;
 
     }
 
