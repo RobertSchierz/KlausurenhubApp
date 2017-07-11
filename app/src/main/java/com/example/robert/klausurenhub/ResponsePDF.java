@@ -28,8 +28,7 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class ResponsePDF {
 
-    private String clauseName;
-    private String uploaderName;
+
     private String schoolVal;
     private String courseVal;
     private String degreeVal;
@@ -39,13 +38,16 @@ public class ResponsePDF {
     private String yearVal;
 
 
-    public final String databaseURL = "http://klausurenhub.bplaced.net/androidapp/updatetable.php";
-
     private Boolean schoolexist;
     private Boolean teacherexist;
     private Boolean courseexist;
     private Boolean subjectexist;
     private Boolean yearexist;
+
+
+    private String clauseName;
+    private String uploaderName;
+    private final String databaseURL = "http://klausurenhub.bplaced.net/androidapp/updatetable.php";
 
     private int clauseSchoolID;
 
