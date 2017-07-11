@@ -37,7 +37,8 @@ public class ResponsePDF {
     private String subjectVal;
     private String teacherVal;
     private String yearVal;
-    private String path = "altklausuren/";
+
+
     public final String databaseURL = "http://klausurenhub.bplaced.net/androidapp/updatetable.php";
 
     private Boolean schoolexist;
@@ -46,7 +47,11 @@ public class ResponsePDF {
     private Boolean subjectexist;
     private Boolean yearexist;
 
-    public ResponsePDF(String clauseName, String schoolVal, String courseVal, String degreeVal, String semesterVal, String subjectVal, String teacherVal, String yearVal) {
+    private int clauseSchoolID;
+
+
+
+    public ResponsePDF(String clauseName, String schoolVal, String courseVal, String degreeVal, String semesterVal, String subjectVal, String teacherVal, String yearVal) throws JSONException {
 
         this.clauseName = clauseName;
         this.schoolVal = schoolVal;
@@ -66,7 +71,7 @@ public class ResponsePDF {
 
         if(this.executeExistingcheck()){
 
-            this.path += this.clauseName + ".pdf";
+            this.clauseName += ".pdf";
 
             this.distinguishBetweenDatalogic();
         }else{
@@ -76,7 +81,7 @@ public class ResponsePDF {
 
     }
 
-    private void distinguishBetweenDatalogic(){
+    private void distinguishBetweenDatalogic() throws JSONException {
         Log.e("school",this.schoolexist.toString() );
         Log.e("teacher", this.teacherexist.toString());
         Log.e("course", this.courseexist.toString());
@@ -84,16 +89,28 @@ public class ResponsePDF {
         Log.e("year", this.yearexist.toString());
         Log.e("clausename", this.clauseName);
         Log.e("username", this.uploaderName);
-        Log.e("path", this.path);
+
 
         if(!this.schoolexist){
             updateDatabaseTable(this.schoolVal, "schools", "schoolName", "schoolID", new VolleyCallback() {
                 @Override
                 public void getNewID(JSONObject ids) throws JSONException {
-                    Log.e("neue ID", ids.getString("schoolID"));
+
                     AvailableAttributes.availableschools.add(schoolVal);
+                    JSONObject jsonObjectschool = new JSONObject();
+                    jsonObjectschool.put("schoolID", ids.getString("schoolID"));
+                    jsonObjectschool.put("schoolName", schoolVal);
+                    AvailableAttributes.schools.put(jsonObjectschool);
+                    clauseSchoolID = Integer.parseInt(ids.getString("schoolID"));
+
                 }
             });
+        }else if(this.schoolexist){
+            for(int i = 0; i <AvailableAttributes.availableschools.size(); i++){
+                if(this.schoolVal.equals(AvailableAttributes.schools.getJSONObject(i).getString("schoolName").toString())){
+                    this.clauseSchoolID = Integer.parseInt(AvailableAttributes.schools.getJSONObject(i).getString("schoolID").toString());
+                }
+            }
         }
 
     }
