@@ -54,6 +54,8 @@ public class Attribute_PDF extends AppCompatActivity {
 
     public Menu optionMenu;
 
+    private ResponsePDF responsePDF;
+
 
     public boolean filled_name = false;
     public boolean filled_school = false;
@@ -114,6 +116,15 @@ public class Attribute_PDF extends AppCompatActivity {
             case R.id.action_upload:
 
                 Toast.makeText(getApplication().getApplicationContext(), "Upload zum Server", Toast.LENGTH_SHORT).show();
+                this.responsePDF = new ResponsePDF(
+                        textinput_name.getText().toString(),
+                        autoCompleteTextView_schools.getText().toString(),
+                        autoCompleteTextView_courses.getText().toString(),
+                        spinner_degrees.getSelectedItem().toString(),
+                        spinner_semesters.getSelectedItem().toString(),
+                        autoCompleteTextView_subjects.getText().toString(),
+                        autoCompleteTextView_teachers.getText().toString(),
+                        autoCompleteTextView_years.getText().toString());
 
 
                 break;

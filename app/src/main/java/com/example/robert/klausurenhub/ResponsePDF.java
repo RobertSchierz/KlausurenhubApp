@@ -1,8 +1,26 @@
 package com.example.robert.klausurenhub;
 
 import android.util.Log;
+import android.widget.Toast;
+
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by Rober on 04.07.2017.
@@ -19,6 +37,8 @@ public class ResponsePDF {
     private String subjectVal;
     private String teacherVal;
     private String yearVal;
+    private String path = "altklausuren/";
+    public final String databaseURL = "http://klausurenhub.bplaced.net/androidapp/updatetable.php";
 
     private Boolean schoolexist;
     private Boolean teacherexist;
@@ -43,8 +63,16 @@ public class ResponsePDF {
             this.uploaderName = "tempuser";
         }
 
-        this.executeExistingcheck();
-        this.distinguishBetweenDatalogic();
+
+        if(this.executeExistingcheck()){
+
+            this.path += this.clauseName + ".pdf";
+
+            this.distinguishBetweenDatalogic();
+        }else{
+            Toast.makeText(getApplicationContext(), "Fehler beim setzten der Attribute", Toast.LENGTH_SHORT).show();
+        }
+
 
     }
 
@@ -54,22 +82,73 @@ public class ResponsePDF {
         Log.e("course", this.courseexist.toString());
         Log.e("subject", this.subjectexist.toString());
         Log.e("year", this.yearexist.toString());
+        Log.e("clausename", this.clauseName);
+        Log.e("username", this.uploaderName);
+        Log.e("path", this.path);
+
+        if(this.schoolexist){
+
+        }
+
+    }
+
+    private void updateDatabaseTable(final String val, final String tablename, final String columname, final String idname, final VolleyCallback callback){
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, this.databaseURL, new Response.Listener<String>(){
+            @Override
+            public void onResponse(String response) {
+                try {
+                    String newID;
+
+                    JSONObject jsonObject = new JSONObject(response.toString());
+                    callback.getNewID(jsonObject.getJSONArray(idname));
+
+
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener(){
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError{
+                Map<String, String> parameters = new HashMap<String, String>();
+                parameters.put("rowvalue", val );
+                parameters.put("columnname", columname);
+                parameters.put("tablename", tablename);
+                parameters.put("id", idname);
+
+                return parameters;
+            }
+        };
+        requestQueue.add(stringRequest);
 
     }
 
 
-    private void executeExistingcheck() {
+    private Boolean executeExistingcheck() {
 
+        Boolean checkError = false;
         if(this.checkOnValErrors()){
             this.schoolexist = this.checkIfValExist(this.schoolVal, "school");
             this.teacherexist = this.checkIfValExist(this.teacherVal, "teacher");
             this.courseexist = this.checkIfValExist(this.courseVal, "course");
             this.subjectexist = this.checkIfValExist(this.subjectVal, "subject");
             this.yearexist = this.checkIfValExist(this.yearVal, "year");
-
+            checkError = true;
         }else if(!this.checkOnValErrors()){
             Log.e("ResponsePDF fail", "Ein PDF Attribut ist nicht gesetzt!");
+            checkError = false;
         }
+
+        return checkError;
 
     }
 
@@ -131,6 +210,13 @@ public class ResponsePDF {
         }
 
         return responseBool;
+    }
+
+
+    public interface VolleyCallback {
+
+        void getNewID(JSONArray ids) throws JSONException;
+
     }
 
 }
