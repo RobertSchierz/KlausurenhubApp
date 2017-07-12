@@ -284,14 +284,20 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_convert:
 
-                Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
 
 
-                this.startAttributeActivity();
-                // if (this.convertToPDF()) {
 
 
-                // }
+                try {
+                    if (this.convertToPDF()) {
+                        Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
+                        this.startAttributeActivity();
+                     }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                } catch (DocumentException e) {
+                    e.printStackTrace();
+                }
 
                 break;
         }
@@ -335,6 +341,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         document.close();
+
+        AvailableAttributes.internalPdfPath =  myFile.getPath();
 
         if (document != null) {
             return true;

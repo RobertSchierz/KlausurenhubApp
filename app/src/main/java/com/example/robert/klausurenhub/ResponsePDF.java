@@ -50,6 +50,16 @@ public class ResponsePDF {
     private final String databaseURL = "http://klausurenhub.bplaced.net/androidapp/updatetable.php";
 
     private int clauseSchoolID;
+    private int clauseTeacherID;
+    private int clauseCourseID;
+    private int clauseSubjectID;
+    private int clauseYearID;
+    private int clauseDegreeID;
+    private int clauseSemesterID;
+
+    //Wichtige Variablen für Asynchronität
+    private int numberOfQueryExecutions = 0;
+    private int numberOfExecutedQueries = 0;
 
 
 
@@ -76,6 +86,9 @@ public class ResponsePDF {
             this.clauseName += ".pdf";
 
             this.distinguishBetweenDatalogic();
+
+            this.uploadPDF();
+
         }else{
             Toast.makeText(getApplicationContext(), "Fehler beim setzten der Attribute", Toast.LENGTH_SHORT).show();
         }
@@ -83,17 +96,50 @@ public class ResponsePDF {
 
     }
 
+    public void uploadPDF(){
+        checkPDFAttributesAreSet();
+
+    }
+
+    private void handleAsyncFunctionallity(){
+        this.numberOfExecutedQueries +=1;
+
+        if(this.numberOfQueryExecutions == this.numberOfExecutedQueries){
+            this.uploadPDF();
+            this.numberOfExecutedQueries = 0;
+        }
+    }
+
+    public Boolean checkPDFAttributesAreSet(){
+        if(!(this.clauseSchoolID == 0) &&
+                !(this.clauseTeacherID == 0) &&
+                !(this.clauseCourseID == 0) &&
+                !(this.clauseSubjectID == 0) &&
+                !(this.clauseYearID == 0) &&
+                !(this.clauseDegreeID == 0) &&
+                !(this.clauseSemesterID == 0) &&
+                (!(this.clauseName.equals("")) || !(this.clauseName == null)) &&
+                ( !(this.uploaderName.equals("") || !(this.uploaderName == null) ) ) &&
+                ( !(AvailableAttributes.internalPdfPath.equals("")) || !(AvailableAttributes.internalPdfPath == null) )
+                ){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
     private void distinguishBetweenDatalogic() throws JSONException {
-        Log.e("school",this.schoolexist.toString() );
+        /*Log.e("school",this.schoolexist.toString() );
         Log.e("teacher", this.teacherexist.toString());
         Log.e("course", this.courseexist.toString());
         Log.e("subject", this.subjectexist.toString());
         Log.e("year", this.yearexist.toString());
         Log.e("clausename", this.clauseName);
-        Log.e("username", this.uploaderName);
+        Log.e("username", this.uploaderName);*/
 
-
+        //Schoolcheck
         if(!this.schoolexist){
+            this.numberOfQueryExecutions += 1;
             updateDatabaseTable(this.schoolVal, "schools", "schoolName", "schoolID", new VolleyCallback() {
                 @Override
                 public void getNewID(JSONObject ids) throws JSONException {
@@ -104,6 +150,7 @@ public class ResponsePDF {
                     jsonObjectschool.put("schoolName", schoolVal);
                     AvailableAttributes.schools.put(jsonObjectschool);
                     clauseSchoolID = Integer.parseInt(ids.getString("schoolID"));
+                    handleAsyncFunctionallity();
 
                 }
             });
@@ -114,6 +161,128 @@ public class ResponsePDF {
                 }
             }
         }
+
+        //Teachercheck
+        if(!this.teacherexist){
+            this.numberOfQueryExecutions += 1;
+            updateDatabaseTable(this.teacherVal, "teachers", "teacherName", "teacherID", new VolleyCallback() {
+                @Override
+                public void getNewID(JSONObject ids) throws JSONException {
+
+                    AvailableAttributes.availableteachers.add(teacherVal);
+                    JSONObject jsonObjectteacher = new JSONObject();
+                    jsonObjectteacher.put("teacherID", ids.getString("teacherID"));
+                    jsonObjectteacher.put("teacherName", teacherVal);
+                    AvailableAttributes.teachers.put(jsonObjectteacher);
+                    clauseTeacherID = Integer.parseInt(ids.getString("teacherID"));
+                    handleAsyncFunctionallity();
+
+                }
+            });
+        }else if(this.teacherexist){
+            for(int i = 0; i <AvailableAttributes.availableteachers.size(); i++){
+                if(this.teacherVal.equals(AvailableAttributes.teachers.getJSONObject(i).getString("teacherName").toString())){
+                    this.clauseTeacherID = Integer.parseInt(AvailableAttributes.teachers.getJSONObject(i).getString("teacherID").toString());
+                }
+            }
+        }
+
+        //Coursecheck
+        if(!this.courseexist){
+            this.numberOfQueryExecutions += 1;
+            updateDatabaseTable(this.courseVal, "courses", "courseName", "courseID", new VolleyCallback() {
+                @Override
+                public void getNewID(JSONObject ids) throws JSONException {
+
+                    AvailableAttributes.availablecourses.add(courseVal);
+                    JSONObject jsonObjectcourse = new JSONObject();
+                    jsonObjectcourse.put("courseID", ids.getString("courseID"));
+                    jsonObjectcourse.put("courseName", courseVal);
+                    AvailableAttributes.courses.put(jsonObjectcourse);
+                    clauseCourseID = Integer.parseInt(ids.getString("courseID"));
+                    handleAsyncFunctionallity();
+
+
+                }
+            });
+        }else if(this.courseexist){
+            for(int i = 0; i <AvailableAttributes.availablecourses.size(); i++){
+                if(this.courseVal.equals(AvailableAttributes.courses.getJSONObject(i).getString("courseName").toString())){
+                    this.clauseCourseID = Integer.parseInt(AvailableAttributes.courses.getJSONObject(i).getString("courseID").toString());
+                }
+            }
+        }
+
+        //Subjectcheck
+        if(!this.subjectexist){
+            this.numberOfQueryExecutions += 1;
+            updateDatabaseTable(this.subjectVal, "subjects", "subjectName", "subjectID", new VolleyCallback() {
+                @Override
+                public void getNewID(JSONObject ids) throws JSONException {
+
+                    AvailableAttributes.availablesubjects.add(subjectVal);
+                    JSONObject jsonObjectsubject = new JSONObject();
+                    jsonObjectsubject.put("subjectID", ids.getString("subjectID"));
+                    jsonObjectsubject.put("subjectName", subjectVal);
+                    AvailableAttributes.subjects.put(jsonObjectsubject);
+                    clauseSubjectID = Integer.parseInt(ids.getString("subjectID"));
+                    handleAsyncFunctionallity();
+
+
+                }
+            });
+        }else if(this.subjectexist){
+            for(int i = 0; i <AvailableAttributes.availablesubjects.size(); i++){
+                if(this.subjectVal.equals(AvailableAttributes.subjects.getJSONObject(i).getString("subjectName").toString())){
+                    this.clauseSubjectID = Integer.parseInt(AvailableAttributes.subjects.getJSONObject(i).getString("subjectID").toString());
+                }
+            }
+        }
+
+        //Yearcheck
+        if(!this.yearexist){
+            this.numberOfQueryExecutions += 1;
+            updateDatabaseTable(this.yearVal, "years", "yearName", "yearID", new VolleyCallback() {
+                @Override
+                public void getNewID(JSONObject ids) throws JSONException {
+
+                    AvailableAttributes.availableyears.add(yearVal);
+                    JSONObject jsonObjectyear = new JSONObject();
+                    jsonObjectyear.put("yearID", ids.getString("yearID"));
+                    jsonObjectyear.put("yearName", yearVal);
+                    AvailableAttributes.years.put(jsonObjectyear);
+                    clauseYearID = Integer.parseInt(ids.getString("yearID"));
+                    handleAsyncFunctionallity();
+
+
+                }
+            });
+        }else if(this.yearexist){
+            for(int i = 0; i <AvailableAttributes.availableyears.size(); i++){
+                if(this.yearVal.equals(AvailableAttributes.years.getJSONObject(i).getString("yearName").toString())){
+                    this.clauseYearID = Integer.parseInt(AvailableAttributes.years.getJSONObject(i).getString("yearID").toString());
+                }
+            }
+        }
+
+        //get DegreeID
+        for(int i = 0; i <AvailableAttributes.availabledegrees.size(); i++){
+            if(this.degreeVal.equals(AvailableAttributes.degrees.getJSONObject(i).getString("degreeName").toString())){
+                this.clauseDegreeID = Integer.parseInt(AvailableAttributes.degrees.getJSONObject(i).getString("degreeID").toString());
+            }
+        }
+
+        //get SemesterID
+        for(int i = 0; i <AvailableAttributes.availablesemesters.size(); i++){
+            if(this.semesterVal.equals(AvailableAttributes.semesters.getJSONObject(i).getString("semesterName").toString())){
+                this.clauseSemesterID = Integer.parseInt(AvailableAttributes.semesters.getJSONObject(i).getString("semesterID").toString());
+            }
+        }
+
+
+
+
+
 
     }
 

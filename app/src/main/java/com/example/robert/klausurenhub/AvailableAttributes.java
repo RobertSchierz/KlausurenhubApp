@@ -46,8 +46,9 @@ public class AvailableAttributes {
 
     public static String username;
 
-
     public final String databaseURL = "http://klausurenhub.bplaced.net/androidapp/getavailableoptions.php";
+
+    public static String internalPdfPath;
 
     public RequestQueue requestQueue;
 
