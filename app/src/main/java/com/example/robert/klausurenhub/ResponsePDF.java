@@ -12,7 +12,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -47,7 +46,8 @@ public class ResponsePDF {
 
     private String clauseName;
     private String uploaderName;
-    private final String databaseURL = "http://klausurenhub.bplaced.net/androidapp/updatetable.php";
+    private final String updateTabledatabaseURL = "http://klausurenhub.bplaced.net/androidapp/updatetable.php";
+    private final String insertClauseIntoDatabaseURL = "http://klausurenhub.bplaced.net/androidapp/insertclause.php";
 
     private int clauseSchoolID;
     private int clauseTeacherID;
@@ -60,7 +60,6 @@ public class ResponsePDF {
     //Wichtige Variablen für Asynchronität
     private int numberOfQueryExecutions = 0;
     private int numberOfExecutedQueries = 0;
-
 
 
     public ResponsePDF(String clauseName, String schoolVal, String courseVal, String degreeVal, String semesterVal, String subjectVal, String teacherVal, String yearVal) throws JSONException {
@@ -81,49 +80,121 @@ public class ResponsePDF {
         }
 
 
-        if(this.executeExistingcheck()){
+        if (this.executeExistingcheck()) {
 
             this.clauseName += ".pdf";
 
             this.distinguishBetweenDatalogic();
 
-            this.uploadPDF();
+            this.uploadPDFHandler();
 
-        }else{
+        } else {
             Toast.makeText(getApplicationContext(), "Fehler beim setzten der Attribute", Toast.LENGTH_SHORT).show();
         }
 
 
     }
 
-    public void uploadPDF(){
-        checkPDFAttributesAreSet();
+    private void uploadPDFHandler() {
+        if (checkPDFAttributesAreSet()) {
+            this.insertClauseIntoDatabase();
+        } else {
+            Toast.makeText(getApplicationContext(), "Fehler beim übertragen der Attribute", Toast.LENGTH_SHORT).show();
+        }
 
     }
 
-    private void handleAsyncFunctionallity(){
-        this.numberOfExecutedQueries +=1;
+    private void uploadPDF() {
 
-        if(this.numberOfQueryExecutions == this.numberOfExecutedQueries){
-            this.uploadPDF();
-            this.numberOfExecutedQueries = 0;
+    }
+
+
+    private void insertClauseIntoDatabase() {
+
+
+        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        JSONObject paramobject = new JSONObject();
+        try {
+
+            paramobject.put("school", clauseSchoolID);
+            paramobject.put("course", clauseCourseID);
+            paramobject.put("degree", clauseDegreeID);
+            paramobject.put("semester", clauseSemesterID);
+            paramobject.put("subject", clauseSubjectID);
+            paramobject.put("teacher", clauseTeacherID);
+            paramobject.put("year", clauseYearID);
+            paramobject.put("name", clauseName);
+            paramobject.put("uploader", uploaderName);
+
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        Log.e("paramobject", paramobject.toString());
+
+        JsonObjectRequest insertClauseIntoDatabaseRequest = new JsonObjectRequest(Request.Method.POST, this.insertClauseIntoDatabaseURL, paramobject, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+
+                try {
+                    if (!response.getBoolean("answer")) {
+                        uploadPDF();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Fehler bei Datenübertragung zur Datenbank", Toast.LENGTH_SHORT).show();
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Fehler", error.toString());
+                Toast.makeText(getApplicationContext(), "Fehler bei Datenübertragung zur Datenbank", Toast.LENGTH_SHORT).show();
+            }
+        }) {
+
+            /**
+             * Passing some request headers
+             * */
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                HashMap<String, String> headers = new HashMap<String, String>();
+                headers.put("Content-Type", "application/json; charset=utf-8");
+                return headers;
+            }
+
+
+        };
+        requestQueue.add(insertClauseIntoDatabaseRequest);
+    }
+
+    private void handleAsyncFunctionallity() {
+        this.numberOfExecutedQueries++;
+
+        if (this.numberOfQueryExecutions == this.numberOfExecutedQueries) {
+            this.uploadPDFHandler();
+            this.numberOfQueryExecutions = 0;
         }
     }
 
-    public Boolean checkPDFAttributesAreSet(){
-        if(!(this.clauseSchoolID == 0) &&
+    public Boolean checkPDFAttributesAreSet() {
+        if (!(this.clauseSchoolID == 0) &&
                 !(this.clauseTeacherID == 0) &&
                 !(this.clauseCourseID == 0) &&
                 !(this.clauseSubjectID == 0) &&
                 !(this.clauseYearID == 0) &&
                 !(this.clauseDegreeID == 0) &&
                 !(this.clauseSemesterID == 0) &&
-                (!(this.clauseName.equals("")) || !(this.clauseName == null)) &&
-                ( !(this.uploaderName.equals("") || !(this.uploaderName == null) ) ) &&
-                ( !(AvailableAttributes.internalPdfPath.equals("")) || !(AvailableAttributes.internalPdfPath == null) )
-                ){
+                (!(this.clauseName.isEmpty()) && !(this.clauseName == null)) &&
+                (!(this.uploaderName.isEmpty() && !(this.uploaderName == null))) &&
+                (!(AvailableAttributes.internalPdfPath.isEmpty()) && !(AvailableAttributes.internalPdfPath == null))
+                ) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -138,7 +209,7 @@ public class ResponsePDF {
         Log.e("username", this.uploaderName);*/
 
         //Schoolcheck
-        if(!this.schoolexist){
+        if (!this.schoolexist) {
             this.numberOfQueryExecutions += 1;
             updateDatabaseTable(this.schoolVal, "schools", "schoolName", "schoolID", new VolleyCallback() {
                 @Override
@@ -154,16 +225,16 @@ public class ResponsePDF {
 
                 }
             });
-        }else if(this.schoolexist){
-            for(int i = 0; i <AvailableAttributes.availableschools.size(); i++){
-                if(this.schoolVal.equals(AvailableAttributes.schools.getJSONObject(i).getString("schoolName").toString())){
+        } else if (this.schoolexist) {
+            for (int i = 0; i < AvailableAttributes.availableschools.size(); i++) {
+                if (this.schoolVal.equals(AvailableAttributes.schools.getJSONObject(i).getString("schoolName").toString())) {
                     this.clauseSchoolID = Integer.parseInt(AvailableAttributes.schools.getJSONObject(i).getString("schoolID").toString());
                 }
             }
         }
 
         //Teachercheck
-        if(!this.teacherexist){
+        if (!this.teacherexist) {
             this.numberOfQueryExecutions += 1;
             updateDatabaseTable(this.teacherVal, "teachers", "teacherName", "teacherID", new VolleyCallback() {
                 @Override
@@ -179,16 +250,16 @@ public class ResponsePDF {
 
                 }
             });
-        }else if(this.teacherexist){
-            for(int i = 0; i <AvailableAttributes.availableteachers.size(); i++){
-                if(this.teacherVal.equals(AvailableAttributes.teachers.getJSONObject(i).getString("teacherName").toString())){
+        } else if (this.teacherexist) {
+            for (int i = 0; i < AvailableAttributes.availableteachers.size(); i++) {
+                if (this.teacherVal.equals(AvailableAttributes.teachers.getJSONObject(i).getString("teacherName").toString())) {
                     this.clauseTeacherID = Integer.parseInt(AvailableAttributes.teachers.getJSONObject(i).getString("teacherID").toString());
                 }
             }
         }
 
         //Coursecheck
-        if(!this.courseexist){
+        if (!this.courseexist) {
             this.numberOfQueryExecutions += 1;
             updateDatabaseTable(this.courseVal, "courses", "courseName", "courseID", new VolleyCallback() {
                 @Override
@@ -205,16 +276,16 @@ public class ResponsePDF {
 
                 }
             });
-        }else if(this.courseexist){
-            for(int i = 0; i <AvailableAttributes.availablecourses.size(); i++){
-                if(this.courseVal.equals(AvailableAttributes.courses.getJSONObject(i).getString("courseName").toString())){
+        } else if (this.courseexist) {
+            for (int i = 0; i < AvailableAttributes.availablecourses.size(); i++) {
+                if (this.courseVal.equals(AvailableAttributes.courses.getJSONObject(i).getString("courseName").toString())) {
                     this.clauseCourseID = Integer.parseInt(AvailableAttributes.courses.getJSONObject(i).getString("courseID").toString());
                 }
             }
         }
 
         //Subjectcheck
-        if(!this.subjectexist){
+        if (!this.subjectexist) {
             this.numberOfQueryExecutions += 1;
             updateDatabaseTable(this.subjectVal, "subjects", "subjectName", "subjectID", new VolleyCallback() {
                 @Override
@@ -231,16 +302,16 @@ public class ResponsePDF {
 
                 }
             });
-        }else if(this.subjectexist){
-            for(int i = 0; i <AvailableAttributes.availablesubjects.size(); i++){
-                if(this.subjectVal.equals(AvailableAttributes.subjects.getJSONObject(i).getString("subjectName").toString())){
+        } else if (this.subjectexist) {
+            for (int i = 0; i < AvailableAttributes.availablesubjects.size(); i++) {
+                if (this.subjectVal.equals(AvailableAttributes.subjects.getJSONObject(i).getString("subjectName").toString())) {
                     this.clauseSubjectID = Integer.parseInt(AvailableAttributes.subjects.getJSONObject(i).getString("subjectID").toString());
                 }
             }
         }
 
         //Yearcheck
-        if(!this.yearexist){
+        if (!this.yearexist) {
             this.numberOfQueryExecutions += 1;
             updateDatabaseTable(this.yearVal, "years", "yearName", "yearID", new VolleyCallback() {
                 @Override
@@ -257,39 +328,35 @@ public class ResponsePDF {
 
                 }
             });
-        }else if(this.yearexist){
-            for(int i = 0; i <AvailableAttributes.availableyears.size(); i++){
-                if(this.yearVal.equals(AvailableAttributes.years.getJSONObject(i).getString("yearName").toString())){
+        } else if (this.yearexist) {
+            for (int i = 0; i < AvailableAttributes.availableyears.size(); i++) {
+                if (this.yearVal.equals(AvailableAttributes.years.getJSONObject(i).getString("yearName").toString())) {
                     this.clauseYearID = Integer.parseInt(AvailableAttributes.years.getJSONObject(i).getString("yearID").toString());
                 }
             }
         }
 
         //get DegreeID
-        for(int i = 0; i <AvailableAttributes.availabledegrees.size(); i++){
-            if(this.degreeVal.equals(AvailableAttributes.degrees.getJSONObject(i).getString("degreeName").toString())){
+        for (int i = 0; i < AvailableAttributes.availabledegrees.size(); i++) {
+            if (this.degreeVal.equals(AvailableAttributes.degrees.getJSONObject(i).getString("degreeName").toString())) {
                 this.clauseDegreeID = Integer.parseInt(AvailableAttributes.degrees.getJSONObject(i).getString("degreeID").toString());
             }
         }
 
         //get SemesterID
-        for(int i = 0; i <AvailableAttributes.availablesemesters.size(); i++){
-            if(this.semesterVal.equals(AvailableAttributes.semesters.getJSONObject(i).getString("semesterName").toString())){
+        for (int i = 0; i < AvailableAttributes.availablesemesters.size(); i++) {
+            if (this.semesterVal.equals(AvailableAttributes.semesters.getJSONObject(i).getString("semesterName").toString())) {
                 this.clauseSemesterID = Integer.parseInt(AvailableAttributes.semesters.getJSONObject(i).getString("semesterID").toString());
             }
         }
 
 
-
-
-
-
     }
 
-    private void updateDatabaseTable(final String val, final String tablename, final String columname, final String idname, final VolleyCallback callback){
+    private void updateDatabaseTable(final String val, final String tablename, final String columname, final String idname, final VolleyCallback callback) {
         RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, this.databaseURL, new Response.Listener<String>(){
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, this.updateTabledatabaseURL, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
                 try {
@@ -303,7 +370,7 @@ public class ResponsePDF {
                     e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener(){
+        }, new Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -311,9 +378,9 @@ public class ResponsePDF {
             }
         }) {
             @Override
-            protected Map<String, String> getParams() throws AuthFailureError{
+            protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> parameters = new HashMap<String, String>();
-                parameters.put("rowvalue", val );
+                parameters.put("rowvalue", val);
                 parameters.put("columnname", columname);
                 parameters.put("tablename", tablename);
                 parameters.put("id", idname);
@@ -329,14 +396,14 @@ public class ResponsePDF {
     private Boolean executeExistingcheck() {
 
         Boolean checkError = false;
-        if(this.checkOnValErrors()){
+        if (this.checkOnValErrors()) {
             this.schoolexist = this.checkIfValExist(this.schoolVal, "school");
             this.teacherexist = this.checkIfValExist(this.teacherVal, "teacher");
             this.courseexist = this.checkIfValExist(this.courseVal, "course");
             this.subjectexist = this.checkIfValExist(this.subjectVal, "subject");
             this.yearexist = this.checkIfValExist(this.yearVal, "year");
             checkError = true;
-        }else if(!this.checkOnValErrors()){
+        } else if (!this.checkOnValErrors()) {
             Log.e("ResponsePDF fail", "Ein PDF Attribut ist nicht gesetzt!");
             checkError = false;
         }
@@ -357,13 +424,10 @@ public class ResponsePDF {
                 this.yearVal.equals("") || this.yearVal == null
                 ) {
             return false;
-        }else{
+        } else {
             return true;
         }
     }
-
-
-
 
 
     private boolean checkIfValExist(String inputval, String source) {
