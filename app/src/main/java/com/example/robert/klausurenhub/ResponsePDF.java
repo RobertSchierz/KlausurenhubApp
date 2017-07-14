@@ -12,9 +12,18 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.apache.commons.net.ftp.FTPClient;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -104,9 +113,51 @@ public class ResponsePDF {
 
     }
 
-    private void uploadPDF() {
+    private void uploadPDF() throws IOException {
+
+        Thread thread = new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                try  {
+                    FTPClient ftpClient = new FTPClient();
+
+
+                    ftpClient.connect(InetAddress.getByName("klausurenhub.bplaced.net"));
+                    ftpClient.login("klausurenhub", "kgbhui1992!");
+                    ftpClient.changeWorkingDirectory("altklausuren/");
+
+                    File file = new File(AvailableAttributes.internalPdfPath);
+
+                    if (ftpClient.getReplyString().contains("250")) {
+                        ftpClient.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
+                        BufferedInputStream buffIn = null;
+                        buffIn = new BufferedInputStream(new FileInputStream(AvailableAttributes.internalPdfPath));
+                        ftpClient.enterLocalPassiveMode();
+
+
+
+                        boolean result = ftpClient.storeFile(file.getName(), buffIn);
+                        buffIn.close();
+                        ftpClient.logout();
+                        ftpClient.disconnect();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        thread.start();
+
+
+
+
+
+
 
     }
+
 
 
     private void insertClauseIntoDatabase() {
@@ -134,21 +185,23 @@ public class ResponsePDF {
 
         Log.e("paramobject", paramobject.toString());
 
-        JsonObjectRequest insertClauseIntoDatabaseRequest = new JsonObjectRequest(Request.Method.POST, this.insertClauseIntoDatabaseURL, paramobject, new Response.Listener<JSONObject>() {
+        JsonObjectRequest insertClauseIntoDatabaseRequest = new JsonObjectRequest(com.android.volley.Request.Method.POST, this.insertClauseIntoDatabaseURL, paramobject, new com.android.volley.Response.Listener<JSONObject>() {
             @Override
             public void onResponse(JSONObject response) {
 
                 try {
-                    if (!response.getBoolean("answer")) {
+                    if (response.getBoolean("answer")) {
                         uploadPDF();
                     } else {
                         Toast.makeText(getApplicationContext(), "Fehler bei Datenübertragung zur Datenbank", Toast.LENGTH_SHORT).show();
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
             }
-        }, new Response.ErrorListener() {
+        }, new com.android.volley.Response.ErrorListener() {
 
             @Override
             public void onErrorResponse(VolleyError error) {
@@ -475,5 +528,7 @@ public class ResponsePDF {
         void getNewID(JSONObject ids) throws JSONException;
 
     }
+
+
 
 }
