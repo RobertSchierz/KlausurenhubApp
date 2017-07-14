@@ -344,11 +344,9 @@ public class MainActivity extends AppCompatActivity {
 
         AvailableAttributes.internalPdfPath =  myFile.getPath();
 
-        if (document != null) {
-            return true;
-        } else {
-            return false;
-        }
+
+        return (document!= null);
+
 
     }
 

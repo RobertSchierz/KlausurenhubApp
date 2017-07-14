@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -56,6 +57,22 @@ public class AvailableAttributes {
     public AvailableAttributes(Context mainContext) {
 
         requestQueue = Volley.newRequestQueue(mainContext);
+
+    }
+
+    public static boolean renameInternalPDF(String newname) {
+        if (!(AvailableAttributes.internalPdfPath.isEmpty())) {
+
+            File oldfile = new File(AvailableAttributes.internalPdfPath);
+            String pathname = oldfile.getParent();
+            File newfile = new File(pathname + "/" + newname);
+            Boolean responsebool = oldfile.getParentFile().exists() && oldfile.exists() && oldfile.renameTo(newfile);
+            AvailableAttributes.internalPdfPath = newfile.getPath();
+            return responsebool;
+        } else {
+            return false;
+        }
+
 
     }
 
@@ -121,6 +138,8 @@ public class AvailableAttributes {
 
 
     }
+
+
 
 }
 

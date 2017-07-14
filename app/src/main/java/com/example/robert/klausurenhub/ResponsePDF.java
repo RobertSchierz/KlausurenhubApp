@@ -162,67 +162,72 @@ public class ResponsePDF {
 
     private void insertClauseIntoDatabase() {
 
+        if(AvailableAttributes.renameInternalPDF(this.clauseName)){
+            RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-        RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
+            JSONObject paramobject = new JSONObject();
+            try {
 
-        JSONObject paramobject = new JSONObject();
-        try {
-
-            paramobject.put("school", clauseSchoolID);
-            paramobject.put("course", clauseCourseID);
-            paramobject.put("degree", clauseDegreeID);
-            paramobject.put("semester", clauseSemesterID);
-            paramobject.put("subject", clauseSubjectID);
-            paramobject.put("teacher", clauseTeacherID);
-            paramobject.put("year", clauseYearID);
-            paramobject.put("name", clauseName);
-            paramobject.put("uploader", uploaderName);
+                paramobject.put("school", clauseSchoolID);
+                paramobject.put("course", clauseCourseID);
+                paramobject.put("degree", clauseDegreeID);
+                paramobject.put("semester", clauseSemesterID);
+                paramobject.put("subject", clauseSubjectID);
+                paramobject.put("teacher", clauseTeacherID);
+                paramobject.put("year", clauseYearID);
+                paramobject.put("name", clauseName);
+                paramobject.put("uploader", uploaderName);
 
 
-        } catch (JSONException e) {
-            e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            Log.e("paramobject", paramobject.toString());
+
+            JsonObjectRequest insertClauseIntoDatabaseRequest = new JsonObjectRequest(com.android.volley.Request.Method.POST, this.insertClauseIntoDatabaseURL, paramobject, new com.android.volley.Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+
+                    try {
+                        if (response.getBoolean("answer")) {
+                            uploadPDF();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Fehler bei Datenübertragung zur Datenbank", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }, new com.android.volley.Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("Fehler", error.toString());
+                    Toast.makeText(getApplicationContext(), "Fehler bei Datenübertragung zur Datenbank", Toast.LENGTH_SHORT).show();
+                }
+            }) {
+
+                /**
+                 * Passing some request headers
+                 * */
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    HashMap<String, String> headers = new HashMap<String, String>();
+                    headers.put("Content-Type", "application/json; charset=utf-8");
+                    return headers;
+                }
+
+
+            };
+            requestQueue.add(insertClauseIntoDatabaseRequest);
+        }else{
+            Toast.makeText(getApplicationContext(), "Fehler beim setzen des Namens der PDF", Toast.LENGTH_SHORT).show();
         }
 
-        Log.e("paramobject", paramobject.toString());
 
-        JsonObjectRequest insertClauseIntoDatabaseRequest = new JsonObjectRequest(com.android.volley.Request.Method.POST, this.insertClauseIntoDatabaseURL, paramobject, new com.android.volley.Response.Listener<JSONObject>() {
-            @Override
-            public void onResponse(JSONObject response) {
-
-                try {
-                    if (response.getBoolean("answer")) {
-                        uploadPDF();
-                    } else {
-                        Toast.makeText(getApplicationContext(), "Fehler bei Datenübertragung zur Datenbank", Toast.LENGTH_SHORT).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }, new com.android.volley.Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("Fehler", error.toString());
-                Toast.makeText(getApplicationContext(), "Fehler bei Datenübertragung zur Datenbank", Toast.LENGTH_SHORT).show();
-            }
-        }) {
-
-            /**
-             * Passing some request headers
-             * */
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
-                return headers;
-            }
-
-
-        };
-        requestQueue.add(insertClauseIntoDatabaseRequest);
     }
 
     private void handleAsyncFunctionallity() {
