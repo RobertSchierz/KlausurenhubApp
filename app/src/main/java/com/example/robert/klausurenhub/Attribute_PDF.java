@@ -6,13 +6,12 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
@@ -57,6 +56,9 @@ public class Attribute_PDF extends AppCompatActivity {
 
     private ResponsePDF responsePDF;
 
+    Animation slide_left;
+
+
 
     public boolean filled_name = false;
     public boolean filled_school = false;
@@ -70,6 +72,14 @@ public class Attribute_PDF extends AppCompatActivity {
 
     @AfterViews
     public void afterViews() {
+
+        this.slide_left = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left);
+
+        autoCompleteTextView_schools.startAnimation(slide_left);
+        autoCompleteTextView_teachers.startAnimation(slide_left);
+        autoCompleteTextView_courses.startAnimation(slide_left);
+        autoCompleteTextView_subjects.startAnimation(slide_left);
+        autoCompleteTextView_years.startAnimation(slide_left);
 
 
         this.createArrayAdapter(AvailableAttributes.availableschools, this.autoCompleteTextView_schools);

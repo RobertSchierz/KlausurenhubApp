@@ -42,12 +42,9 @@ dependencies {
     compile 'com.google.code.gson:gson:2.3.1'
     compile 'com.itextpdf:itextg:5.5.9'
     compile 'com.mcxiaoke.volley:library:1.0.18'
-    //compile 'com.squareup.okhttp3:okhttp:3.3.1'
-    /*compile 'com.squareup.retrofit2:retrofit:2.3.0'
-    compile 'com.squareup.okhttp3:logging-interceptor:3.4.1'
-    compile 'com.squareup.okhttp3:okhttp:3.4.1'*/
-
     compile group: 'commons-net', name: 'commons-net', version: '3.3'
+
+
 
 
 

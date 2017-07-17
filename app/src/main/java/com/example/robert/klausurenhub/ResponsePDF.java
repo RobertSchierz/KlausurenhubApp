@@ -20,10 +20,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-
 import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -71,6 +68,8 @@ public class ResponsePDF {
     private int numberOfExecutedQueries = 0;
 
 
+
+
     public ResponsePDF(String clauseName, String schoolVal, String courseVal, String degreeVal, String semesterVal, String subjectVal, String teacherVal, String yearVal) throws JSONException {
 
         this.clauseName = clauseName;
@@ -115,6 +114,9 @@ public class ResponsePDF {
 
     private void uploadPDF() throws IOException {
 
+
+
+
         Thread thread = new Thread(new Runnable() {
 
             @Override
@@ -149,6 +151,9 @@ public class ResponsePDF {
         });
 
         thread.start();
+
+
+
 
 
 
