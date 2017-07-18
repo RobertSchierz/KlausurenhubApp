@@ -14,9 +14,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.facebook.AccessToken;
+import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -46,18 +49,51 @@ public class Facebooklogin extends AppCompatActivity {
     @ViewById
     TextView facebook_loginstatus;
 
-    CallbackManager callbackManager;
+    @ViewById
+    TextView facebook_name;
+
+    @ViewById
+    TextView facebook_email;
+
+    @ViewById
+    ImageView facebook_image;
+
+    //CallbackManager callbackManager;
 
 
+    AccessToken accessToken;
+
+    private CallbackManager callbackManager;
+
+    private boolean isLoggedin = false;
 
     @AfterViews
     public void afterViews() {
 
+
+        FacebookSdk.sdkInitialize(getApplicationContext());
+
+
+        callbackManager = CallbackManager.Factory.create();
+        processFacebookLogin();
+
+
+        AccessTokenTracker accessTokenTracker = new AccessTokenTracker() {
+            @Override
+            protected void onCurrentAccessTokenChanged(AccessToken oldAccessToken,
+                                                       AccessToken currentAccessToken) {
+                if (currentAccessToken == null) {
+                   Log.v("AMK", "logout");
+                }
+            }
+        };
+
+        /*
         AccessToken accessToken = AccessToken.getCurrentAccessToken();
 
-        if(accessToken != null){
+        if (accessToken != null) {
             startMainActivity();
-        }else{
+        } else {
 
             FacebookSdk.sdkInitialize(getApplicationContext());
             callbackManager = CallbackManager.Factory.create();
@@ -70,10 +106,9 @@ public class Facebooklogin extends AppCompatActivity {
                     SharedPreferences prefs = getSharedPreferences("Facebookdata", Context.MODE_PRIVATE);
                     String facebookval = searchFacebookVal(prefs, "facebookname");
 
-                    if((facebookval.isEmpty())){
+                    if ((facebookval.isEmpty())) {
                         Facebooklogin.this.requestUserProfile(loginResult);
                     }
-
 
 
                     facebook_loginstatus.setText("Login erfolgreich " + loginResult.getAccessToken().getUserId());
@@ -101,22 +136,101 @@ public class Facebooklogin extends AppCompatActivity {
 
             });
 
+            //  }
+
         }
+*/
+    }
+
+
+
+    private void processFacebookLogin() {
+
+        if (accessToken != null) {
+            accessToken = com.facebook.AccessToken.getCurrentAccessToken();
+
+            //LoginManager.getInstance().logOut();
+        }
+        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+
+
+                GraphRequest graphRequest = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
+                    @Override
+                    public void onCompleted(JSONObject object, GraphResponse response) {
+                        String userDatil = response.getRawResponse();
+                        try {
+                            JSONObject jsonObject = new JSONObject(userDatil);
+                            Log.e("JsonObject: ", jsonObject.toString());
+
+
+                            String facebookId = jsonObject.getString("id");
+                            String email = jsonObject.getString("email");
+                            String name = jsonObject.getString("name");
+                            String facebookImage = "https://graph.facebook.com/" + facebookId + "/picture?type=large";
+
+                            facebook_loginstatus.setText(facebookId);
+                            facebook_email.setText(email);
+                            facebook_name.setText(name);
+
+                            Glide.with(getApplicationContext()).load(facebookImage).into(facebook_image);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                Bundle parameters = new Bundle();
+                parameters.putString("fields", "name, email");
+                graphRequest.setParameters(parameters);
+                graphRequest.executeAsync();
+
+
+            }
+
+            @Override
+            public void onCancel() {
+                Log.e("Login: ", "Canceled");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.e("Login: ", "Networkerror");
+            }
+        });
+
 
     }
 
-    private String searchFacebookVal(SharedPreferences sharedPreferences, String value){
+    @Click
+    public void fb_login_btnClicked() {
 
-        Map<String,?> keys = sharedPreferences.getAll();
+        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+    }
 
-        for(Map.Entry<String,?> entry : keys.entrySet()){
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        callbackManager.onActivityResult(requestCode, resultCode, data);
+
+    }
+
+    /*
+
+    private String searchFacebookVal(SharedPreferences sharedPreferences, String value) {
+
+        Map<String, ?> keys = sharedPreferences.getAll();
+
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
             return entry.getValue().toString();
         }
         return null;
 
     }
 
-    public void requestUserProfile(LoginResult loginResult){
+    public void requestUserProfile(LoginResult loginResult) {
         GraphRequest.newMeRequest(
                 loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
@@ -142,21 +256,19 @@ public class Facebooklogin extends AppCompatActivity {
                 }).executeAsync();
     }
 
-    public void startMainActivity(){
+    public void startMainActivity() {
         startActivity(new Intent(Facebooklogin.this, MainActivity_.class));
         this.facebook_loginstatus.setText("");
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(data != null  ){
+        if (data != null) {
             super.onActivityResult(requestCode, resultCode, data);
             callbackManager.onActivityResult(requestCode, resultCode, data);
         }
 
     }
 
-
-
-
+*/
 }
