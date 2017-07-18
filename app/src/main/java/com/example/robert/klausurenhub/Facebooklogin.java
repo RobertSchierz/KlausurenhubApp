@@ -34,6 +34,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Arrays;
+import java.util.Map;
 
 @EActivity(R.layout.activity_facebooklogin)
 public class Facebooklogin extends AppCompatActivity {
@@ -58,43 +59,60 @@ public class Facebooklogin extends AppCompatActivity {
             startMainActivity();
         }else{
 
-        FacebookSdk.sdkInitialize(getApplicationContext());
-        callbackManager = CallbackManager.Factory.create();
+            FacebookSdk.sdkInitialize(getApplicationContext());
+            callbackManager = CallbackManager.Factory.create();
 
-        LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
+            LoginManager.getInstance().logInWithReadPermissions(this, Arrays.asList("public_profile", "email"));
 
-        LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
+            LoginManager.getInstance().registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+                @Override
+                public void onSuccess(LoginResult loginResult) {
+                    SharedPreferences prefs = getSharedPreferences("Facebookdata", Context.MODE_PRIVATE);
+                    String facebookval = searchFacebookVal(prefs, "facebookname");
 
-                Facebooklogin.this.requestUserProfile(loginResult);
-
-                facebook_loginstatus.setText("Login erfolgreich " + loginResult.getAccessToken().getUserId());
-                facebook_loginstatus.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.facebooklogin_success));
-                // 2 Sekundenbreak
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                       startMainActivity();
+                    if((facebookval.isEmpty())){
+                        Facebooklogin.this.requestUserProfile(loginResult);
                     }
-                }, 2000);
-                ;
-            }
-
-            @Override
-            public void onCancel() {
-                facebook_loginstatus.setText("Login abgebrochen");
-            }
-
-            @Override
-            public void onError(FacebookException error) {
-
-            }
 
 
-        });
+
+                    facebook_loginstatus.setText("Login erfolgreich " + loginResult.getAccessToken().getUserId());
+                    facebook_loginstatus.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.facebooklogin_success));
+                    // 2 Sekundenbreak
+                    Handler handler = new Handler();
+                    handler.postDelayed(new Runnable() {
+                        public void run() {
+                            startMainActivity();
+                        }
+                    }, 2000);
+                    ;
+                }
+
+                @Override
+                public void onCancel() {
+                    facebook_loginstatus.setText("Login abgebrochen");
+                }
+
+                @Override
+                public void onError(FacebookException error) {
+
+                }
+
+
+            });
 
         }
+
+    }
+
+    private String searchFacebookVal(SharedPreferences sharedPreferences, String value){
+
+        Map<String,?> keys = sharedPreferences.getAll();
+
+        for(Map.Entry<String,?> entry : keys.entrySet()){
+            return entry.getValue().toString();
+        }
+        return null;
 
     }
 
@@ -114,10 +132,10 @@ public class Facebooklogin extends AppCompatActivity {
                             String id = me.optString("id");
 
 
-                           // Log.e("Result", me.toString());
+                            // Log.e("Result", me.toString());
                             SharedPreferences prefs = getSharedPreferences("Facebookdata", Context.MODE_PRIVATE);
                             SharedPreferences.Editor editor = prefs.edit();
-                            editor.putString("facebookname", me.optString("name "));
+                            editor.putString("facebookname", me.optString("name"));
                             editor.commit();
                         }
                     }
@@ -126,12 +144,16 @@ public class Facebooklogin extends AppCompatActivity {
 
     public void startMainActivity(){
         startActivity(new Intent(Facebooklogin.this, MainActivity_.class));
+        this.facebook_loginstatus.setText("");
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
+        if(data != null  ){
+            super.onActivityResult(requestCode, resultCode, data);
+            callbackManager.onActivityResult(requestCode, resultCode, data);
+        }
+
     }
 
 

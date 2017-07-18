@@ -25,6 +25,7 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
+import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import org.androidannotations.annotations.AfterViews;
@@ -358,19 +359,21 @@ public class MainActivity extends AppCompatActivity {
         OutputStream output = new FileOutputStream(myFile);
 
 
-        Document document = new Document(PageSize.A4);
+        Document document = new Document(/*PageSize.A4*/);
 
         PdfWriter.getInstance(document, output);
         document.open();
 
         for (int i = 0; i < this.getImagePaths().size(); i++) {
+
             Image image = Image.getInstance(this.getImagePaths().get(i));
-            image.setAbsolutePosition(0, 0);
-            image.setAlignment(Image.ALIGN_CENTER);
-            image.scaleToFit(document.getPageSize().getWidth(), document.getPageSize().getHeight());
             image.setRotationDegrees(-90);
-            document.add(image);
+
+            document.setPageSize(new Rectangle(image.getScaledWidth(), image.getScaledHeight()));
             document.newPage();
+
+            document.add(image);
+
         }
 
         document.close();
@@ -383,7 +386,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-   /* private void viewPdf() {
+    private void viewPdf() {
         Intent intent = new Intent(Intent.ACTION_VIEW);
 
         String authorities = getApplicationContext().getPackageName() + ".fileprovider";
@@ -395,7 +398,7 @@ public class MainActivity extends AppCompatActivity {
 
         startActivity(intent);
     }
-*/
+
 
 
 
