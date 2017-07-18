@@ -104,6 +104,10 @@ public class ResponsePDF {
 
             this.distinguishBetweenDatalogic();
 
+            if(this.numberOfQueryExecutions == 0){
+                this.uploadPDFHandler();
+            }
+
 
         } else {
             Toast.makeText(getApplicationContext(), "Fehler beim setzten der Attribute", Toast.LENGTH_SHORT).show();
