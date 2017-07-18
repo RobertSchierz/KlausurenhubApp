@@ -36,6 +36,13 @@
             android:screenOrientation="portrait"></activity>
 
         <activity
+            android:name=".UploadComplete_"
+            android:screenOrientation="portrait">
+
+
+        </activity>
+
+        <activity
             android:name=".Facebooklogin_"
             android:allowBackup="true"
             android:icon="@mipmap/ic_launcher"

@@ -1,32 +1,40 @@
 package com.example.robert.klausurenhub;
 
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONException;
+import org.json.JSONObject;
+import org.w3c.dom.Attr;
 
 import java.util.ArrayList;
+
+import static android.support.v4.content.ContextCompat.startActivity;
 
 /**
  * Created by Rober on 05.07.2017.
  */
 
 @EActivity(R.layout.attribute_pdf)
-public class Attribute_PDF extends AppCompatActivity {
+public class Attribute_PDF extends AppCompatActivity{
 
     @ViewById
     AutoCompleteTextView autoCompleteTextView_schools;
@@ -98,6 +106,16 @@ public class Attribute_PDF extends AppCompatActivity {
         setChangeListener(this.autoCompleteTextView_subjects, null, "subject");
         setChangeListener(this.autoCompleteTextView_years, null, "year");
 
+       /* autoCompleteTextView_years.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if(actionId == EditorInfo.IME_ACTION_DONE){
+
+                    return true;
+                }
+                return false;
+            }
+        });*/
 
     }
 
@@ -121,6 +139,8 @@ public class Attribute_PDF extends AppCompatActivity {
         }
     }
 
+
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -136,7 +156,10 @@ public class Attribute_PDF extends AppCompatActivity {
                             spinner_semesters.getSelectedItem().toString(),
                             autoCompleteTextView_subjects.getText().toString(),
                             autoCompleteTextView_teachers.getText().toString(),
-                            autoCompleteTextView_years.getText().toString());
+                            autoCompleteTextView_years.getText().toString(),
+                            this);
+
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -261,6 +284,7 @@ public class Attribute_PDF extends AppCompatActivity {
 
         autoCompleteTextView.setAdapter(autocompletetextAdapter);
     }
+
 
 
 }

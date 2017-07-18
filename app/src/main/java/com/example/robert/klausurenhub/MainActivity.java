@@ -12,6 +12,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -41,6 +42,8 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+
+import static android.support.v4.content.ContextCompat.startActivity;
 
 @EActivity(R.layout.activity_main)
 public class MainActivity extends AppCompatActivity {
@@ -277,6 +280,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void startAttributeActivity(){
         startActivity(new Intent(MainActivity.this, Attribute_PDF_.class));
+
     }
 
     @Override
@@ -350,18 +354,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    private void viewPdf() {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
 
-        String authorities = getApplicationContext().getPackageName() + ".fileprovider";
-        Uri pdfURI = FileProvider.getUriForFile(this, authorities, this.tempPDF);
-
-        intent.setDataAndType(pdfURI, "application/pdf");
-        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-
-        startActivity(intent);
-    }
 
 
     public ArrayList<String> getImagePaths() {

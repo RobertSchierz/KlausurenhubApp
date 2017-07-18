@@ -1,5 +1,8 @@
 package com.example.robert.klausurenhub;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -25,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import static android.support.v4.content.ContextCompat.startActivity;
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -67,10 +71,14 @@ public class ResponsePDF {
     private int numberOfQueryExecutions = 0;
     private int numberOfExecutedQueries = 0;
 
+    private Activity responsePDF;
 
 
 
-    public ResponsePDF(String clauseName, String schoolVal, String courseVal, String degreeVal, String semesterVal, String subjectVal, String teacherVal, String yearVal) throws JSONException {
+
+
+
+    public ResponsePDF(String clauseName, String schoolVal, String courseVal, String degreeVal, String semesterVal, String subjectVal, String teacherVal, String yearVal, Activity responsePDF) throws JSONException {
 
         this.clauseName = clauseName;
         this.schoolVal = schoolVal;
@@ -80,6 +88,8 @@ public class ResponsePDF {
         this.subjectVal = subjectVal;
         this.teacherVal = teacherVal;
         this.yearVal = yearVal;
+
+        this.responsePDF = responsePDF;
 
         if (AvailableAttributes.username != null) {
             this.uploaderName = AvailableAttributes.username;
@@ -114,58 +124,16 @@ public class ResponsePDF {
 
     private void uploadPDF() throws IOException {
 
-
-
-
-        Thread thread = new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                try  {
-                    FTPClient ftpClient = new FTPClient();
-
-
-                    ftpClient.connect(InetAddress.getByName("klausurenhub.bplaced.net"));
-                    ftpClient.login("klausurenhub", "kgbhui1992!");
-                    ftpClient.changeWorkingDirectory("altklausuren/");
-
-                    File file = new File(AvailableAttributes.internalPdfPath);
-
-                    if (ftpClient.getReplyString().contains("250")) {
-                        ftpClient.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
-                        BufferedInputStream buffIn = null;
-                        buffIn = new BufferedInputStream(new FileInputStream(AvailableAttributes.internalPdfPath));
-                        ftpClient.enterLocalPassiveMode();
-
-
-
-                        boolean result = ftpClient.storeFile(file.getName(), buffIn);
-                        buffIn.close();
-                        ftpClient.logout();
-                        ftpClient.disconnect();
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        thread.start();
-
-
-
-
-
-
-
-
-
-
+        new UploadTask(this.responsePDF).execute();
     }
 
 
 
+
+
+
     private void insertClauseIntoDatabase() {
+
 
         if(AvailableAttributes.renameInternalPDF(this.clauseName)){
             RequestQueue requestQueue = Volley.newRequestQueue(getApplicationContext());
@@ -542,3 +510,74 @@ public class ResponsePDF {
 
 
 }
+
+
+class UploadTask extends AsyncTask<String, Void, Boolean>{
+
+    Activity responsePDF;
+
+    public UploadTask(Activity responsePDF){
+        this.responsePDF = responsePDF;
+    }
+
+
+    @Override
+    protected void onPostExecute(Boolean result){
+
+        if(result){
+            Intent intent = new Intent(this.responsePDF, UploadComplete_.class);
+            this.responsePDF.startActivity(intent);
+        }else{
+            Toast.makeText(this.responsePDF.getApplicationContext(), "Fehler beim Hochladen", Toast.LENGTH_SHORT).show();
+        }
+
+
+    }
+
+
+
+
+    @Override
+    protected Boolean doInBackground(String... params) {
+
+        Boolean resultofupload = false;
+        try  {
+            FTPClient ftpClient = new FTPClient();
+
+
+            ftpClient.connect(InetAddress.getByName("klausurenhub.bplaced.net"));
+            ftpClient.login("klausurenhub", "kgbhui1992!");
+            ftpClient.changeWorkingDirectory("altklausuren/");
+
+            File file = new File(AvailableAttributes.internalPdfPath);
+
+            if (ftpClient.getReplyString().contains("250")) {
+                ftpClient.setFileType(org.apache.commons.net.ftp.FTP.BINARY_FILE_TYPE);
+                BufferedInputStream buffIn = null;
+                buffIn = new BufferedInputStream(new FileInputStream(AvailableAttributes.internalPdfPath));
+                ftpClient.enterLocalPassiveMode();
+
+
+
+                boolean result = ftpClient.storeFile(file.getName(), buffIn);
+                resultofupload = result;
+                buffIn.close();
+                ftpClient.logout();
+                ftpClient.disconnect();
+
+
+
+
+
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return resultofupload;
+    }
+
+}
+
+
+
