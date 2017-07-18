@@ -75,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
     @ViewById
     RecyclerView recyclerView;
 
+    //Wichtige Variablen für Asynchronität
+    private int numberOfQueryExecutions = 7;
+    private int numberOfExecutedQueries = 0;
+    private Boolean allQueriesExecuted = false;
+
 
     @AfterViews
     public void afterViews() {
@@ -102,6 +107,17 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private void asynchandler(){
+        this.numberOfExecutedQueries++;
+        if(this.numberOfExecutedQueries == this.numberOfQueryExecutions){
+            this.allQueriesExecuted = true;
+            this.numberOfExecutedQueries = 0;
+        }
+        else{
+            this.allQueriesExecuted = false;
+        }
+    }
+
 
 
     public void setAvailableOptions() {
@@ -113,42 +129,49 @@ public class MainActivity extends AppCompatActivity {
             public void getSchools(JSONArray schools) throws JSONException {
                 AvailableAttributes.schools = schools;
                 AvailableAttributes.availableschools = extractAvailableOptions(schools, "schoolName") ;
+                asynchandler();
             }
 
             @Override
             public void getCourses(JSONArray courses) throws JSONException {
                 AvailableAttributes.courses = courses;
                 AvailableAttributes.availablecourses = extractAvailableOptions(courses, "courseName");
+                asynchandler();
             }
 
             @Override
             public void getDegrees(JSONArray degrees) throws JSONException {
                 AvailableAttributes.degrees = degrees;
                 AvailableAttributes.availabledegrees = extractAvailableOptions(degrees, "degreeName");
+                asynchandler();
             }
 
             @Override
             public void getSemesters(JSONArray semesters) throws JSONException {
                 AvailableAttributes.semesters = semesters;
                 AvailableAttributes.availablesemesters = extractAvailableOptions(semesters, "semesterName");
+                asynchandler();
             }
 
             @Override
             public void getSubjects(JSONArray subjects) throws JSONException {
                 AvailableAttributes.subjects = subjects;
                 AvailableAttributes.availablesubjects = extractAvailableOptions(subjects, "subjectName");
+                asynchandler();
             }
 
             @Override
             public void getTeachers(JSONArray teachers) throws JSONException {
                 AvailableAttributes.teachers = teachers;
                 AvailableAttributes.availableteachers = extractAvailableOptions(teachers, "teacherName");
+                asynchandler();
             }
 
             @Override
             public void getYears(JSONArray years) throws JSONException {
                 AvailableAttributes.years = years;
                 AvailableAttributes.availableyears = extractAvailableOptions(years, "yearName");
+                asynchandler();
             }
 
             public ArrayList<String> extractAvailableOptions(JSONArray sourcearray, String columnName) throws JSONException {
@@ -288,20 +311,26 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_convert:
 
-
-
-
-
-                try {
-                    if (this.convertToPDF()) {
-                        Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
-                        this.startAttributeActivity();
-                     }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (DocumentException e) {
-                    e.printStackTrace();
+                if(this.allQueriesExecuted){
+                    Log.v("Queriesexecuted: ", this.allQueriesExecuted.toString());
+                    try {
+                        if (this.convertToPDF()) {
+                            Toast.makeText(getApplication().getApplicationContext(), "PDF Erstellt!", Toast.LENGTH_SHORT).show();
+                            this.startAttributeActivity();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } catch (DocumentException e) {
+                        e.printStackTrace();
+                    }
+                }else{
+                    Log.v("Queriesexecuted: ", this.allQueriesExecuted.toString());
+                    Toast.makeText(getApplication().getApplicationContext(), "Fehler beim Laden der Availableoptions!", Toast.LENGTH_SHORT).show();
+                    this.setAvailableOptions();
+                    Toast.makeText(getApplication().getApplicationContext(), "Availableoptions werden neu geladen", Toast.LENGTH_SHORT).show();
                 }
+
+
 
                 break;
         }
@@ -353,6 +382,20 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
+
+   /* private void viewPdf() {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+
+        String authorities = getApplicationContext().getPackageName() + ".fileprovider";
+        Uri pdfURI = FileProvider.getUriForFile(this, authorities, this.tempPDF);
+
+        intent.setDataAndType(pdfURI, "application/pdf");
+        intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+        startActivity(intent);
+    }
+*/
 
 
 
