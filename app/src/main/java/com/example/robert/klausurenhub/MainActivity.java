@@ -43,6 +43,7 @@ import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 import static android.support.v4.content.ContextCompat.startActivity;
 
@@ -99,12 +100,24 @@ public class MainActivity extends AppCompatActivity {
 
         this.setAvailableOptions();
 
+        /*SharedPreferences prefs = getSharedPreferences("Facebookdata", 0);
+        String facebookname = this.searchFacebookVal(prefs, "facebookname");
+        */
 
-        SharedPreferences prefs = getSharedPreferences("Facebookdata", 0);
-        String facebookname = prefs.getString("facebookname", "default_value");
-        AvailableAttributes.username = facebookname;
+        //AvailableAttributes.username = facebookname;
         Toast.makeText(getApplication().getApplicationContext(), "Eingeloggt als: " + AvailableAttributes.username, Toast.LENGTH_SHORT).show();
 
+
+    }
+
+    private String searchFacebookVal(SharedPreferences sharedPreferences, String value) {
+
+        Map<String, ?> keys = sharedPreferences.getAll();
+
+        for (Map.Entry<String, ?> entry : keys.entrySet()) {
+            return entry.getValue().toString();
+        }
+        return null;
 
     }
 

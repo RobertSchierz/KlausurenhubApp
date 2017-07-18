@@ -7,13 +7,14 @@
     tools:context="com.example.robert.klausurenhub.Facebooklogin">
 
 
-    <com.facebook.login.widget.LoginButton
+   <!-- <com.facebook.login.widget.LoginButton
         android:id="@+id/fb_login_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/facebook_image"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="42dp"></com.facebook.login.widget.LoginButton>
+-->
 
 
     <TextView
@@ -21,7 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Login Status"
+        android:text="ID"
         android:textStyle="bold"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="true"
@@ -57,4 +58,19 @@
         android:layout_marginTop="33dp"
         android:layout_below="@+id/facebook_email"
         android:layout_centerHorizontal="true" />
+
+    <Button
+        android:id="@+id/fb_login_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/facebook_image"
+        android:layout_alignStart="@+id/facebook_image"
+        android:layout_below="@+id/facebook_image"
+        android:layout_marginTop="37dp"
+        android:backgroundTint="@color/com_facebook_blue"
+        android:fontFamily="sans-serif"
+        android:text="Weiter mit Facebook"
+        android:textAllCaps="false"
+        android:textColor="@color/com_facebook_button_text_color"
+        android:textSize="12sp" />
 </RelativeLayout>
