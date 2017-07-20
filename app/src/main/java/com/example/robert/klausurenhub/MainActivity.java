@@ -18,7 +18,12 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.itextpdf.text.Document;
@@ -75,6 +80,12 @@ public class MainActivity extends AppCompatActivity {
     FloatingActionButton cameraButton;
 
     @ViewById
+    TextView newimages_text;
+
+    @ViewById
+    ImageView newimages_arrow;
+
+    @ViewById
     RecyclerView recyclerView;
 
     //Wichtige Variablen für Asynchronität
@@ -82,6 +93,9 @@ public class MainActivity extends AppCompatActivity {
     private int numberOfExecutedQueries = 0;
     private Boolean allQueriesExecuted = false;
 
+
+
+    Animation slide_left;
 
     @AfterViews
     public void afterViews() {
@@ -105,6 +119,9 @@ public class MainActivity extends AppCompatActivity {
 
         Toast.makeText(getApplication().getApplicationContext(), "Eingeloggt als: " + AvailableAttributes.username, Toast.LENGTH_SHORT).show();
 
+        this.slide_left = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_left);
+        this.newimages_text.setAnimation(slide_left);
+        this.newimages_arrow.setAnimation(slide_left);
 
     }
 
@@ -290,6 +307,8 @@ public class MainActivity extends AppCompatActivity {
     public void checkImagelenthForToolbar() {
         if (this.mAdapter.getItemCount() > 0) {
             displayMenuItem(this.optionMenu, true, "convertImages");
+            this.newimages_text.setVisibility(View.INVISIBLE);
+            this.newimages_arrow.setVisibility(View.INVISIBLE);
         }
     }
 

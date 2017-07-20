@@ -62,6 +62,8 @@ class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
                                             adapter.notifyDataSetChanged();
                                             if(adapter.getItemCount() == 0){
                                                 activity.displayMenuItem(activity.optionMenu, false, "convertImages");
+                                                activity.newimages_text.setVisibility(View.VISIBLE);
+                                                activity.newimages_arrow.setVisibility(View.VISIBLE);
                                             }
                                         }
                                     } catch (Exception e) {
