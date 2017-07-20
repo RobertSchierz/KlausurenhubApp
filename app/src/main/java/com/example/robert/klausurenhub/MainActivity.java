@@ -87,24 +87,22 @@ public class MainActivity extends AppCompatActivity {
     public void afterViews() {
 
 
-        // Define a layout for RecyclerView
+
         recyclerView.setHasFixedSize(true);
         mLayoutManager = new GridLayoutManager(this, getResources().getInteger(R.integer.grid_rows));
         recyclerView.setLayoutManager(mLayoutManager);
 
-        // Initialize a new instance of RecyclerView Adapter instance
+
         mAdapter = new ImageAdapter(this, this.documentImageArray, this);
 
-        // Set the adapter for RecyclerView
+
         recyclerView.setAdapter(mAdapter);
 
         this.setAvailableOptions();
 
-        /*SharedPreferences prefs = getSharedPreferences("Facebookdata", 0);
-        String facebookname = this.searchFacebookVal(prefs, "facebookname");
-        */
 
-        //AvailableAttributes.username = facebookname;
+
+
         Toast.makeText(getApplication().getApplicationContext(), "Eingeloggt als: " + AvailableAttributes.username, Toast.LENGTH_SHORT).show();
 
 

@@ -246,27 +246,9 @@ public class Facebooklogin extends AppCompatActivity {
 
     }
 
-    private String searchFacebookVal(SharedPreferences sharedPreferences, String value) {
 
-        Map<String, ?> keys = sharedPreferences.getAll();
 
-        for (Map.Entry<String, ?> entry : keys.entrySet()) {
-            return entry.getValue().toString();
-        }
-        return null;
 
-    }
-
-    private Boolean checkPrefs() {
-        SharedPreferences prefs = getSharedPreferences("Facebookdata", Context.MODE_PRIVATE);
-        String facebookval = searchFacebookVal(prefs, "facebookname");
-
-        if (facebookval != null) {
-            return true;
-        } else {
-            return false;
-        }
-    }
 
 
 }
