@@ -125,6 +125,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /*
     private String searchFacebookVal(SharedPreferences sharedPreferences, String value) {
 
         Map<String, ?> keys = sharedPreferences.getAll();
@@ -134,7 +135,8 @@ public class MainActivity extends AppCompatActivity {
         }
         return null;
 
-    }
+    }*/
+
 
     private void asynchandler(){
         this.numberOfExecutedQueries++;
@@ -232,9 +234,9 @@ public class MainActivity extends AppCompatActivity {
         File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
 
         File image = File.createTempFile(
-                imageFileName,  /* prefix */
-                ".jpg",         /* suffix */
-                storageDir      /* directory */
+                imageFileName,
+                ".jpg",
+                storageDir
         );
 
 

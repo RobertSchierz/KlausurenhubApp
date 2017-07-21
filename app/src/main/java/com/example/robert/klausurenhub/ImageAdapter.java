@@ -75,7 +75,6 @@ class ImageAdapter extends RecyclerView.Adapter<ImageAdapter.ViewHolder> {
                             })
                             .setNegativeButton(R.string.delete_image_cancel, new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int id) {
-                                    // User cancelled the dialog
                                 }
                             });
                     builder.create();
